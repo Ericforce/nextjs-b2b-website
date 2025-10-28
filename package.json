@@ -1,0 +1,76 @@
+{
+  "name": "nextjs-sanity-isr-project",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Next.js + Sanity CMS project with Incremental Static Regeneration",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "type-check": "tsc --noEmit",
+    "sanity:dev": "cd sanity && npm run dev",
+    "sanity:deploy": "cd sanity && npm run deploy",
+    "sanity:export": "cd sanity && sanity dataset export production backup.tar.gz",
+    "sanity:import": "cd sanity && sanity dataset import backup.tar.gz production",
+    "sanity:typegen": "cd sanity && sanity schema extract && sanity typegen generate",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@sanity/client": "^6.15.0",
+    "@sanity/image-url": "^1.0.2",
+    "@portabletext/react": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "prettier": "^3.2.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "@testing-library/react": "^14.2.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@playwright/test": "^1.42.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "nextjs",
+    "sanity",
+    "cms",
+    "isr",
+    "react",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT"
+}
