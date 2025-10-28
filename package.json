@@ -1,0 +1,9 @@
+{
+  "name": "sanity-studio-schemas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sanity schema modules and config for site settings, pages, blog, authors, taxonomies, and reusable sections",
+  "scripts": {
+    "sanity:check": "node ./scripts/sanity-check.js"
+  }
+}
