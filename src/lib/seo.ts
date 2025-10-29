@@ -209,10 +209,24 @@ export function buildArticleJsonLd(
   site: SiteSettings
 ) {
   const baseUrl = getSiteBaseUrl(site);
-  const imageUrl = absoluteUrl(
-    post.featuredImage?.url ?? site.defaultSeo.ogImage?.url,
-    baseUrl
-  );
+  const heroImageUrl =
+    (typeof post.heroImage === "object" && post.heroImage?.url
+      ? post.heroImage.url
+      : undefined) ?? site.defaultSeo.ogImage?.url;
+  const imageUrl = heroImageUrl ? absoluteUrl(heroImageUrl, baseUrl) : undefined;
+
+  const authorData =
+    typeof post.author === "object" && post.author && "name" in post.author
+      ? (post.author as { name?: string; website?: string })
+      : undefined;
+
+  const tagTitles = (post.tags ?? [])
+    .map((tag) =>
+      typeof tag === "object" && tag && "title" in tag
+        ? (tag as { title?: string }).title
+        : undefined
+    )
+    .filter((value): value is string => Boolean(value));
 
   return {
     "@context": "https://schema.org",
@@ -222,11 +236,13 @@ export function buildArticleJsonLd(
     url: canonicalUrl,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
-    author: {
-      "@type": "Person",
-      name: post.author.name,
-      url: post.author.url,
-    },
+    author: authorData
+      ? {
+          "@type": "Person",
+          name: authorData.name,
+          url: authorData.website,
+        }
+      : undefined,
     publisher: {
       "@type": "Organization",
       name: site.siteName,
@@ -238,7 +254,8 @@ export function buildArticleJsonLd(
         : undefined,
     },
     image: imageUrl ? [imageUrl] : undefined,
-    keywords: post.seo?.keywords ?? post.tags,
+    keywords:
+      post.seo?.keywords ?? (tagTitles.length > 0 ? tagTitles : undefined),
     inLanguage: site.locale,
   };
 }

@@ -17,16 +17,26 @@ export const getAllBlogPosts = cache(async (): Promise<BlogPostDocument[]> => {
   return posts;
 });
 
+export const slugToString = (
+  slug: PageDocument["slug"] | BlogPostDocument["slug"]
+): string => {
+  if (typeof slug === "string") {
+    return slug;
+  }
+
+  return slug?.current ?? "";
+};
+
 export async function getPageBySlug(
   slug: string
 ): Promise<PageDocument | undefined> {
   const allPages = await getAllPages();
-  return allPages.find((page) => page.slug === slug);
+  return allPages.find((page) => slugToString(page.slug) === slug);
 }
 
 export async function getBlogPostBySlug(
   slug: string
 ): Promise<BlogPostDocument | undefined> {
   const allPosts = await getAllBlogPosts();
-  return allPosts.find((post) => post.slug === slug);
+  return allPosts.find((post) => slugToString(post.slug) === slug);
 }

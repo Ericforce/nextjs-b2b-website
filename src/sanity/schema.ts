@@ -1,3 +1,5 @@
 import type { SchemaTypeDefinition } from "sanity";
 
-export const schemaTypes: SchemaTypeDefinition[] = [];
+import { schemas } from "./schemas";
+
+export const schemaTypes: SchemaTypeDefinition[] = schemas;
