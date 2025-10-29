@@ -13,9 +13,18 @@ interface PortableTextProps {
   tone?: "light" | "dark";
 }
 
-type CalloutVariant = "info" | "success" | "warning" | "danger" | "note" | "tip";
+type CalloutVariant =
+  | "info"
+  | "success"
+  | "warning"
+  | "danger"
+  | "note"
+  | "tip";
 
-const CALLOUT_VARIANT_STYLES: Record<CalloutVariant, { icon: string; light: string; dark: string }> = {
+const CALLOUT_VARIANT_STYLES: Record<
+  CalloutVariant,
+  { icon: string; light: string; dark: string }
+> = {
   info: {
     icon: "ℹ️",
     light: "border-primary-200 bg-primary-50 text-primary-900",
@@ -78,8 +87,10 @@ function createPortableTextComponents(
   tone: "light" | "dark"
 ): PortableTextComponents {
   const headingColor = tone === "dark" ? "text-white" : "text-secondary-900";
-  const bodyColor = tone === "dark" ? "text-secondary-200" : "text-secondary-600";
-  const borderColor = tone === "dark" ? "border-secondary-700" : "border-primary-200";
+  const bodyColor =
+    tone === "dark" ? "text-secondary-200" : "text-secondary-600";
+  const borderColor =
+    tone === "dark" ? "border-secondary-700" : "border-primary-200";
 
   const components: PortableTextComponents = {
     block: {
@@ -87,27 +98,19 @@ function createPortableTextComponents(
         <p className={cn("text-base leading-7", bodyColor)}>{children}</p>
       ),
       h2: ({ children }) => (
-        <h2
-          className={cn(
-            "text-2xl font-semibold sm:text-3xl",
-            headingColor
-          )}
-        >
+        <h2 className={cn("text-2xl font-semibold sm:text-3xl", headingColor)}>
           {children}
         </h2>
       ),
       h3: ({ children }) => (
-        <h3
-          className={cn(
-            "text-xl font-semibold sm:text-2xl",
-            headingColor
-          )}
-        >
+        <h3 className={cn("text-xl font-semibold sm:text-2xl", headingColor)}>
           {children}
         </h3>
       ),
       h4: ({ children }) => (
-        <h4 className={cn("text-lg font-semibold", headingColor)}>{children}</h4>
+        <h4 className={cn("text-lg font-semibold", headingColor)}>
+          {children}
+        </h4>
       ),
       h5: ({ children }) => (
         <h5 className={cn("text-base font-semibold", headingColor)}>
@@ -115,7 +118,9 @@ function createPortableTextComponents(
         </h5>
       ),
       h6: ({ children }) => (
-        <h6 className={cn("text-sm font-semibold", headingColor)}>{children}</h6>
+        <h6 className={cn("text-sm font-semibold", headingColor)}>
+          {children}
+        </h6>
       ),
       blockquote: ({ children }) => (
         <blockquote
@@ -138,10 +143,10 @@ function createPortableTextComponents(
               ? "/"
               : `/${value.slug}`
             : value?.slug?.current
-            ? value.slug.current === "home"
-              ? "/"
-              : `/${value.slug.current}`
-            : "#");
+              ? value.slug.current === "home"
+                ? "/"
+                : `/${value.slug.current}`
+              : "#");
 
         if (!href || href === "#") {
           return <>{children}</>;
@@ -186,7 +191,9 @@ function createPortableTextComponents(
     },
     list: {
       bullet: ({ children }) => (
-        <ul className={cn("ml-6 list-disc space-y-2", bodyColor)}>{children}</ul>
+        <ul className={cn("ml-6 list-disc space-y-2", bodyColor)}>
+          {children}
+        </ul>
       ),
       number: ({ children }) => (
         <ol className={cn("ml-6 list-decimal space-y-2", bodyColor)}>
@@ -223,8 +230,9 @@ function createPortableTextComponents(
         ? bodyBlocks
         : (value as { content?: PortableTextBlock[] })?.content;
 
-      const fallbackText = (value as { text?: string; description?: string })
-        ?.text ?? (value as { description?: string })?.description;
+      const fallbackText =
+        (value as { text?: string; description?: string })?.text ??
+        (value as { description?: string })?.description;
 
       return (
         <div

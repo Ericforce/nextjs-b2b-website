@@ -35,7 +35,8 @@ export interface SiteSocialLinks {
 
 export interface NavigationLink {
   label: string;
-  href: string;
+  href?: string;
+  reference?: PageDocument | BlogPostDocument;
   openInNewTab?: boolean;
 }
 
@@ -48,8 +49,12 @@ export interface FooterSection {
 
 export type CtaVariant = "primary" | "secondary" | "ghost" | "link";
 
-export interface CallToAction extends NavigationLink {
+export interface CallToAction {
+  text: string;
+  href?: string;
+  reference?: PageDocument | BlogPostDocument;
   variant?: CtaVariant;
+  openInNewTab?: boolean;
 }
 
 export interface SiteNavigation {
@@ -58,20 +63,23 @@ export interface SiteNavigation {
 }
 
 export interface SiteSettings {
-  siteName: string;
-  description: string;
-  locale: string;
-  siteUrl: string;
-  email?: string;
+  _id: string;
+  _type: "siteSettings";
+  title: string;
+  description?: string;
+  locale?: string;
+  siteUrl?: string;
+  contactEmail?: string;
   logo?: SanityImageAsset;
   favicon?: string;
-  defaultSeo: SeoFields;
-  navigation: SiteNavigation;
-  footerSections: FooterSection[];
-  social?: SiteSocialLinks;
-  headerCta?: CallToAction | null;
+  defaultSeo?: SeoFields;
+  mainNavigation?: NavigationLink[];
+  secondaryNavigation?: NavigationLink[];
+  headerCTA?: CallToAction;
+  footerSections?: FooterSection[];
+  socialLinks?: SiteSocialLinks;
   copyrightText?: string;
-  updatedAt: string;
+  _updatedAt?: string;
 }
 
 export interface BaseSection {
@@ -89,10 +97,12 @@ export interface HeroSection extends BaseSection {
   description?: string;
   alignment?: "left" | "center" | "right";
   backgroundColor?: string;
-  primaryCta?: CallToAction | null;
-  secondaryCta?: CallToAction | null;
-  backgroundImage?: SanityImageAsset | null;
-  mediaImage?: SanityImageAsset | null;
+  primaryCTA?: CallToAction;
+  secondaryCTA?: CallToAction;
+  backgroundImage?: SanityImageAsset;
+  media?: {
+    image?: SanityImageAsset;
+  };
 }
 
 export interface FeatureGridItem {
@@ -100,7 +110,7 @@ export interface FeatureGridItem {
   title?: string;
   description?: string;
   icon?: string;
-  image?: SanityImageAsset | null;
+  image?: SanityImageAsset;
 }
 
 export interface FeatureGridSection extends BaseSection {
@@ -117,8 +127,8 @@ export interface CallToActionSection extends BaseSection {
   description?: string;
   alignment?: "left" | "center" | "right";
   backgroundColor?: string;
-  primaryCta?: CallToAction | null;
-  secondaryCta?: CallToAction | null;
+  primaryCTA?: CallToAction;
+  secondaryCTA?: CallToAction;
 }
 
 export interface Testimonial {
@@ -128,11 +138,11 @@ export interface Testimonial {
   role?: string;
   company?: string;
   rating?: number;
-  image?: SanityImageAsset | null;
-  logo?: SanityImageAsset | null;
+  image?: SanityImageAsset;
+  logo?: SanityImageAsset;
 }
 
-export interface TestimonialsSection extends BaseSection {
+export interface TestimonialSection extends BaseSection {
   _type: "testimonialSection";
   headline?: string;
   description?: string;
@@ -178,7 +188,7 @@ export interface StatsSection extends BaseSection {
 export interface LogoCloudItem {
   _key?: string;
   href?: string;
-  image?: SanityImageAsset | null;
+  image?: SanityImageAsset;
 }
 
 export interface LogoCloudSection extends BaseSection {
@@ -206,6 +216,15 @@ export interface ContactSection extends BaseSection {
   contactDetails?: ContactDetail[];
 }
 
+export interface ReusableSectionDocument {
+  _id: string;
+  _type: "reusableSection";
+  title: string;
+  description?: string;
+  sections?: PageSection[];
+  _updatedAt?: string;
+}
+
 export interface ReusableSection extends BaseSection {
   _type: "reusableSection";
   title?: string;
@@ -214,16 +233,18 @@ export interface ReusableSection extends BaseSection {
 
 export interface ReusableSectionReference extends BaseSection {
   _type: "reusableSectionReference";
-  section?: ReusableSection;
+  section?: ReusableSectionDocument;
 }
 
-export interface UnknownSection extends BaseSection {}
+export interface UnknownSection extends BaseSection {
+  _type: string;
+}
 
 export type PageSection =
   | HeroSection
   | FeatureGridSection
   | CallToActionSection
-  | TestimonialsSection
+  | TestimonialSection
   | RichTextSection
   | LogoCloudSection
   | FaqSection
@@ -236,32 +257,104 @@ export type PageSection =
 export interface PageDocument {
   _id?: string;
   _type: "page";
-  slug: string;
+  slug: {
+    current: string;
+  };
   title: string;
   description?: string;
+  publishedAt?: string;
   createdAt?: string;
-  updatedAt?: string;
+  _updatedAt?: string;
   seo?: SeoFields;
   sections?: PageSection[];
 }
 
-export interface BlogAuthor {
+export interface AuthorDocument {
+  _id: string;
+  _type: "author";
   name: string;
-  url?: string;
+  slug: {
+    current: string;
+  };
+  bio?: string;
+  image?: SanityImageAsset;
+  website?: string;
+  email?: string;
+  socialLinks?: SiteSocialLinks;
+  _updatedAt?: string;
+}
+
+export interface CategoryDocument {
+  _id: string;
+  _type: "category";
+  title: string;
+  slug: {
+    current: string;
+  };
+  description?: string;
+  color?: string;
+  icon?: string;
+  _updatedAt?: string;
+}
+
+export interface TagDocument {
+  _id: string;
+  _type: "tag";
+  title: string;
+  slug: {
+    current: string;
+  };
+  description?: string;
+  color?: string;
+  _updatedAt?: string;
 }
 
 export interface BlogPostDocument {
-  _type: "post";
-  slug: string;
+  _id?: string;
+  _type: "blogPost";
+  slug: {
+    current: string;
+  };
   title: string;
   excerpt: string;
-  body: string;
-  tags?: string[];
-  readingTime?: string;
   featuredImage?: SanityImageAsset;
-  createdAt: string;
-  publishedAt: string;
-  updatedAt?: string;
-  author: BlogAuthor;
+  body?: PortableTextBlock[];
+  author?: AuthorDocument;
+  categories?: CategoryDocument[];
+  tags?: TagDocument[];
+  publishedAt?: string;
+  createdAt?: string;
+  _updatedAt?: string;
   seo?: SeoFields;
+}
+
+// Link annotations for Portable Text
+export interface LinkInternalAnnotation {
+  _type: "linkInternal";
+  reference?: PageDocument | BlogPostDocument;
+}
+
+export interface LinkExternalAnnotation {
+  _type: "linkExternal";
+  href: string;
+  openInNewTab?: boolean;
+}
+
+// Code block object for Portable Text
+export interface CodeBlock {
+  _type: "codeBlock";
+  language?: string;
+  code: string;
+  filename?: string;
+}
+
+// Image object for Portable Text
+export interface PortableTextImage {
+  _type: "image";
+  asset: {
+    _ref: string;
+    _type: "reference";
+  };
+  alt?: string;
+  caption?: string;
 }

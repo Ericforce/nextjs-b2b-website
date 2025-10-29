@@ -63,7 +63,8 @@ export async function generateMetadata({
     title: page.title,
     description: page.description,
     seo: page.seo,
-    canonicalPath: page.seo?.canonical ?? (page.slug === HOME_SLUG ? "/" : `/${page.slug}`),
+    canonicalPath:
+      page.seo?.canonical ?? (page.slug === HOME_SLUG ? "/" : `/${page.slug}`),
   });
 }
 
@@ -77,7 +78,8 @@ export default async function MarketingPage({ params }: PageProps) {
 
   const { siteSettings } = await getMetadataDefaults();
 
-  const canonicalPath = page.seo?.canonical ?? (page.slug === HOME_SLUG ? "/" : `/${page.slug}`);
+  const canonicalPath =
+    page.seo?.canonical ?? (page.slug === HOME_SLUG ? "/" : `/${page.slug}`);
   const canonicalUrl = absoluteUrl(canonicalPath, siteSettings.siteUrl);
   const isHomePage = page.slug === HOME_SLUG;
 

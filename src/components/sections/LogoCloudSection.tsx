@@ -24,7 +24,12 @@ export function LogoCloudSection(section: LogoCloudSectionType) {
     >
       <div className="container-custom">
         {headline ? (
-          <h2 className={cn("text-center text-2xl font-semibold sm:text-3xl", palette.heading)}>
+          <h2
+            className={cn(
+              "text-center text-2xl font-semibold sm:text-3xl",
+              palette.heading
+            )}
+          >
             {headline}
           </h2>
         ) : null}

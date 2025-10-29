@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-import type {
-  FooterSection,
-  SanityImageAsset,
-  SiteSocialLinks,
-} from "@/types";
+import type { FooterSection, SanityImageAsset, SiteSocialLinks } from "@/types";
 
 interface FooterProps {
   siteName?: string;
@@ -104,10 +100,11 @@ export default function Footer({
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const resolvedSiteName = siteName ?? "B2B App";
-  const siteDescription = description ??
+  const siteDescription =
+    description ??
     "Building modern B2B experiences with a flexible, content-driven architecture.";
-  const sections = footerSections?.filter((section) =>
-    (section?.links?.length ?? 0) > 0
+  const sections = footerSections?.filter(
+    (section) => (section?.links?.length ?? 0) > 0
   );
 
   const socialEntries = SOCIAL_KEYS.flatMap((key) => {

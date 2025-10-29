@@ -1,396 +1,335 @@
-# Content Model
+# Content Model Documentation
 
-This document describes the Sanity CMS content model, including all schemas, field descriptions, and how each content type is used throughout the application.
+This document outlines the Sanity content model, including document types, sections, objects, and editorial workflows.
 
-## Overview
-
-The content model is designed to provide maximum flexibility for content editors while maintaining consistency across the site. All schemas are defined in the Sanity Studio and can be edited through the Studio interface.
-
-## Core Schemas
-
-### Page
-
-The `page` schema represents individual pages on the site (e.g., Home, About, Products).
-
-**Fields:**
-
-- **title** (`string`, required)
-  - The page title used for SEO and internal references
-  - Appears in browser tabs and search results
-
-- **slug** (`slug`, required)
-  - URL-friendly identifier (e.g., `about-us`, `pricing`)
-  - Auto-generated from title but can be customized
-  - Must be unique across all pages
-
-- **seoTitle** (`string`, optional)
-  - Override the default title for SEO purposes
-  - Recommended length: 50-60 characters
-  - Falls back to `title` if not provided
-
-- **seoDescription** (`text`, optional)
-  - Meta description for search engines
-  - Recommended length: 150-160 characters
-  - Should be compelling and include target keywords
-
-- **openGraphImage** (`image`, optional)
-  - Image displayed when page is shared on social media
-  - Recommended size: 1200x630px
-  - Falls back to default site image if not provided
-
-- **sections** (`array`, required)
-  - List of reusable content sections that make up the page
-  - Can include: Hero, Features, CTA, Testimonials, etc.
-  - Drag-and-drop ordering in Studio
-  - See [Section Types](#section-types) below
-
-- **publishedAt** (`datetime`, optional)
-  - Publication date and time
-  - Used for sorting and display
-  - Automatically set on first publish
-
-### Blog Post
-
-The `blogPost` schema represents individual blog articles.
-
-**Fields:**
-
-- **title** (`string`, required)
-  - Blog post title
-  - Used in listings, detail page, and SEO
-
-- **slug** (`slug`, required)
-  - URL identifier (e.g., `introducing-new-features`)
-  - Auto-generated from title
-  - Must be unique across all blog posts
-
-- **excerpt** (`text`, optional)
-  - Short summary of the post (2-3 sentences)
-  - Displayed in blog listings and meta descriptions
-  - Recommended length: 150-200 characters
-
-- **author** (`reference`, optional)
-  - Reference to an Author document
-  - Displays author name, photo, and bio on post
-
-- **mainImage** (`image`, required)
-  - Featured image for the blog post
-  - Displayed at top of post and in listings
-  - Recommended size: 1200x675px
-  - Includes alt text field for accessibility
-
-- **categories** (`array`, optional)
-  - Tags/categories for organization
-  - References to Category documents
-  - Used for filtering and related posts
-
-- **body** (`blockContent`, required)
-  - Main content of the blog post
-  - Supports rich text formatting, images, code blocks, and embeds
-  - See [Block Content](#block-content) below
-
-- **seoTitle** (`string`, optional)
-  - Override title for SEO
-  - Falls back to `title` if not provided
-
-- **seoDescription** (`text`, optional)
-  - Meta description for search engines
-  - Falls back to `excerpt` if not provided
-
-- **publishedAt** (`datetime`, required)
-  - Publication date
-  - Used for sorting, display, and RSS feed
-  - Can be scheduled for future publication
-
-### Author
-
-The `author` schema represents blog post authors and team members.
-
-**Fields:**
-
-- **name** (`string`, required)
-  - Full name of the author
-
-- **slug** (`slug`, required)
-  - URL identifier for author archive pages
-
-- **image** (`image`, optional)
-  - Author photo/headshot
-  - Displayed with blog posts
-  - Recommended size: 400x400px (square)
-
-- **bio** (`text`, optional)
-  - Short biography (2-3 sentences)
-  - Displayed on author pages and blog posts
-
-- **socialLinks** (`object`, optional)
-  - Twitter, LinkedIn, GitHub profile URLs
-  - Displayed as social icons with author info
-
-### Category
-
-The `category` schema is used to organize blog posts.
-
-**Fields:**
-
-- **title** (`string`, required)
-  - Category name (e.g., "Product Updates", "Engineering")
-
-- **slug** (`slug`, required)
-  - URL identifier for category pages
-
-- **description** (`text`, optional)
-  - Brief description of the category
-  - Displayed on category archive pages
+## Document Types
 
 ### Site Settings
+- **Type**: `siteSettings`
+- **Purpose**: Global site configuration and defaults
+- **Singleton**: Yes (only one instance)
+- **Key Fields**:
+  - Site name, description, locale, URL
+  - Logo and favicon
+  - Default SEO settings
+  - Navigation (main and secondary)
+  - Header CTA
+  - Footer sections
+  - Social media links
+  - Copyright text
 
-The `siteSettings` schema stores global site configuration (singleton).
+### Pages
+- **Type**: `page`
+- **Purpose**: Static pages with flexible content sections
+- **Key Fields**:
+  - Title and slug
+  - Description
+  - SEO overrides
+  - Sections (array of content sections)
 
-**Fields:**
+### Blog Posts
+- **Type**: `blogPost`
+- **Purpose**: Blog articles with rich content
+- **Key Fields**:
+  - Title, slug, excerpt
+  - Featured image
+  - Portable Text body content
+  - Author reference
+  - Category and tag references
+  - Published date
+  - SEO overrides
 
-- **title** (`string`, required)
-  - Site name (e.g., "B2B App")
-  - Used in headers, footers, and SEO
+### Authors
+- **Type**: `author`
+- **Purpose**: Blog post authors
+- **Key Fields**:
+  - Name, slug, bio
+  - Profile image
+  - Website and email
+  - Social media links
 
-- **description** (`text`, required)
-  - Default site description for SEO
+### Categories
+- **Type**: `category`
+- **Purpose**: Blog post categorization
+- **Key Fields**:
+  - Title, slug, description
+  - Color for UI display
+  - Icon
 
-- **logo** (`image`, optional)
-  - Site logo image
-  - Displayed in header
+### Tags
+- **Type**: `tag`
+- **Purpose**: Blog post tagging
+- **Key Fields**:
+  - Title, slug, description
+  - Color for UI display
 
-- **favicon** (`image`, optional)
-  - Browser favicon
-  - Recommended size: 32x32px or 64x64px
-
-- **socialLinks** (`object`, optional)
-  - Global social media profile URLs
-  - Displayed in footer
-
-- **contactEmail** (`string`, optional)
-  - Primary contact email address
-  - Used in footer and contact forms
-
-- **copyrightText** (`string`, optional)
-  - Copyright notice displayed in footer
-  - Default: "© {year} {siteName}. All rights reserved."
-
-- **headerCTA** (`object`, optional)
-  - Call-to-action button in header
-  - Fields: text, link, variant
-
-- **footerSections** (`array`, optional)
-  - Footer navigation sections
-  - Organized into columns with links
+### Reusable Sections
+- **Type**: `reusableSection`
+- **Purpose**: Content sections that can be reused across multiple pages
+- **Key Fields**:
+  - Title and description
+  - Array of sections (same as page sections)
 
 ## Section Types
 
-Sections are reusable content blocks that can be added to pages. Each section type has specific fields optimized for its purpose.
-
 ### Hero Section
+- **Type**: `heroSection`
+- **Purpose**: Page hero with headline, description, and CTAs
+- **Features**:
+  - Eyebrow, headline, subheadline, tagline
+  - Description text
+  - Alignment options
+  - Background color
+  - Primary and secondary CTAs
+  - Background image
+  - Media image
 
-Hero banner with headline, subheadline, and CTA buttons.
-
-**Fields:**
-- `headline` (string): Main heading
-- `subheadline` (text): Supporting text
-- `primaryCTA` (object): Button text and link
-- `secondaryCTA` (object): Optional second button
-- `backgroundImage` (image): Optional background image
-- `alignment` (string): left, center, or right
-
-### Feature Grid
-
-Grid layout showcasing features or benefits.
-
-**Fields:**
-- `headline` (string): Section title
-- `description` (text): Section introduction
-- `features` (array): List of features
-  - `title` (string): Feature name
-  - `description` (text): Feature description
-  - `icon` (string): Icon identifier
-  - `image` (image): Optional feature image
-- `columns` (number): 2, 3, or 4 columns
-
-### CTA Section
-
-Call-to-action section with button.
-
-**Fields:**
-- `headline` (string): Main text
-- `description` (text): Supporting text
-- `buttonText` (string): CTA button label
-- `buttonLink` (string): Button URL
-- `backgroundColor` (string): Section background color
-- `alignment` (string): left, center, or right
+### Feature Grid Section
+- **Type**: `featureGridSection`
+- **Purpose**: Display features in a grid layout
+- **Features**:
+  - Headline and description
+  - Column count (1-4)
+  - Feature items with title, description, icon, and image
 
 ### Testimonial Section
+- **Type**: `testimonialSection`
+- **Purpose**: Display customer testimonials
+- **Features**:
+  - Headline and description
+  - Layout options (carousel, grid, single)
+  - Testimonials with quote, author, role, company, rating, images
 
-Customer testimonials and social proof.
-
-**Fields:**
-- `headline` (string): Section title
-- `testimonials` (array): List of testimonials
-  - `quote` (text): Customer quote
-  - `author` (string): Customer name
-  - `role` (string): Customer title/company
-  - `image` (image): Customer photo
-  - `rating` (number): Optional star rating
-- `layout` (string): carousel, grid, or single
+### Call to Action Section
+- **Type**: `ctaSection`
+- **Purpose**: Prominent call-to-action section
+- **Features**:
+  - Headline and description
+  - Alignment options
+  - Background color
+  - Primary and secondary CTAs
 
 ### Rich Text Section
-
-Flexible content area with formatted text, images, and embeds.
-
-**Fields:**
-- `content` (blockContent): Rich text editor
-- `backgroundColor` (string): Section background
-- `width` (string): narrow, medium, or full
-
-### Logo Cloud
-
-Display client/partner logos.
-
-**Fields:**
-- `headline` (string): Section title
-- `logos` (array): List of logo images
-  - `image` (image): Logo image
-  - `alt` (string): Logo alt text
-  - `link` (url): Optional company website
-- `grayscale` (boolean): Display logos in grayscale
+- **Type**: `richTextSection`
+- **Purpose**: Rich text content with formatting
+- **Features**:
+  - Headline
+  - Background color
+  - Width options (narrow, medium, full)
+  - Portable Text content with links, images, code blocks
 
 ### FAQ Section
-
-Frequently asked questions with expandable answers.
-
-**Fields:**
-- `headline` (string): Section title
-- `faqs` (array): List of Q&A pairs
-  - `question` (string): Question text
-  - `answer` (blockContent): Answer with formatting
-- `layout` (string): single-column or two-column
+- **Type**: `faqSection`
+- **Purpose**: Frequently asked questions
+- **Features**:
+  - Headline
+  - Layout options (single-column, two-column)
+  - FAQ items with question and Portable Text answers
 
 ### Stats Section
+- **Type**: `statsSection`
+- **Purpose**: Display key statistics
+- **Features**:
+  - Headline and description
+  - Stat items with value, label, and icon
 
-Highlight key metrics and numbers.
+### Logo Cloud Section
+- **Type**: `logoCloudSection`
+- **Purpose**: Display logos of partners or clients
+- **Features**:
+  - Headline
+  - Grayscale option
+  - Logo items with images and optional links
 
-**Fields:**
-- `headline` (string): Section title
-- `description` (text): Supporting text
-- `stats` (array): List of statistics
-  - `value` (string): Metric value (e.g., "500+", "99.9%")
-  - `label` (string): Metric description
-  - `icon` (string): Optional icon identifier
+### Contact Section
+- **Type**: `contactSection`
+- **Purpose**: Contact information and form
+- **Features**:
+  - Eyebrow, headline, description
+  - Background color
+  - Show/hide contact form
+  - Contact details (email, phone, address, etc.)
 
-## Block Content
+### Reusable Section Reference
+- **Type**: `reusableSectionReference`
+- **Purpose**: Reference to a reusable section
+- **Features**:
+  - Reference to a reusable section document
 
-Block content is Sanity's rich text format, supporting:
+## Object Types
 
-- **Text Formatting**: Bold, italic, underline, strikethrough
-- **Headings**: H2, H3, H4, H5, H6
-- **Lists**: Bulleted and numbered lists
-- **Links**: Internal page links and external URLs
-- **Images**: Inline images with captions and alt text
-- **Code Blocks**: Syntax-highlighted code with language selection
-- **Quotes**: Blockquote formatting
-- **Custom Blocks**: Buttons, callouts, embeds (YouTube, Twitter, etc.)
+### Navigation Link
+- **Type**: `navigationLink`
+- **Purpose**: Links for navigation menus
+- **Features**:
+  - Label text
+  - External URL or internal page reference
+  - Open in new tab option
 
-## Field Validation
+### Call to Action
+- **Type**: `callToAction`
+- **Purpose**: Button-style links
+- **Features**:
+  - Button text
+  - External URL or internal page reference
+  - Variant (primary, secondary, ghost, link)
+  - Open in new tab option
 
-All schemas include validation rules to ensure content quality:
+### Image with Hotspot
+- **Type**: `imageWithHotspot`
+- **Purpose**: Images with hotspot cropping
+- **Features**:
+  - Image with hotspot
+  - Alternative text
+  - Caption
 
-- **Required Fields**: Marked with asterisk (*) in Studio
-- **Slug Uniqueness**: Enforced at document level
-- **Image Requirements**: Minimum dimensions and file types
-- **Character Limits**: Enforced for SEO fields
-- **URL Validation**: Ensures valid URLs in link fields
+### SEO
+- **Type**: `seo`
+- **Purpose**: SEO metadata
+- **Features**:
+  - Title, description, title template
+  - Canonical URL, no index option
+  - Keywords
+  - Open Graph and Twitter card settings
 
-## Content Organization
+### Social Links
+- **Type**: `socialLinks`
+- **Purpose**: Social media profile links
+- **Features**:
+  - Twitter, LinkedIn, GitHub, YouTube, Facebook, Instagram
 
-### Page Structure
+### Contact Details
+- **Type**: `contactDetails`
+- **Purpose**: Contact information items
+- **Features**:
+  - Label and value
+  - Icon
+  - Optional link (mailto:, tel:, or URL)
 
-Pages are built using a modular section system:
+### Link Annotations
+- **Internal Link**: `linkInternal` - Links to internal documents
+- **External Link**: `linkExternal` - Links to external URLs
 
-1. Content editor creates/edits a Page document
-2. Sections are added via the "Add section" button
-3. Each section can be reordered by drag-and-drop
-4. Section-specific fields appear based on section type
-5. Preview available before publishing
+### Code Block
+- **Type**: `codeBlock`
+- **Purpose**: Code snippets in Portable Text
+- **Features**:
+  - Language syntax highlighting
+  - Code content
+  - Optional filename
 
-### Blog Structure
+## Editorial Workflows
 
-Blog posts follow a standard article format:
+### Creating a New Page
+1. Navigate to Pages in Sanity Studio
+2. Create new page document
+3. Add title and slug
+4. Add sections to build page content
+5. Configure SEO settings
+6. Publish
 
-1. Title, excerpt, and featured image at the top
-2. Author information and metadata
-3. Rich text body content
-4. Categories for organization
-5. Related posts automatically suggested
+### Creating a Blog Post
+1. Navigate to Blog Posts in Sanity Studio
+2. Create new blog post document
+3. Add title, slug, and excerpt
+4. Set featured image
+5. Write body content using Portable Text editor
+6. Assign author, categories, and tags
+7. Set published date
+8. Configure SEO settings
+9. Publish
 
-## Best Practices
+### Managing Authors
+1. Navigate to Authors in Sanity Studio
+2. Create author document
+3. Add name, bio, and profile information
+4. Set profile image
+5. Add social media links
+6. Publish
 
-### SEO Optimization
+### Creating Reusable Sections
+1. Navigate to Reusable Sections in Sanity Studio
+2. Create new reusable section document
+3. Add title and description
+4. Build section content
+5. Publish
+6. Reference from pages using "Reusable Section Reference"
 
-- Always fill in `seoTitle` and `seoDescription` for important pages
-- Use descriptive alt text for all images
-- Keep URLs short and keyword-focused
-- Include target keywords naturally in content
+### Site Configuration
+1. Navigate to Site Settings in Sanity Studio
+2. Update global settings
+3. Configure navigation menus
+4. Set default SEO
+5. Add social media links
+6. Save changes
 
-### Content Quality
+## Naming Conventions
 
-- Write compelling headlines (under 60 characters)
-- Keep meta descriptions between 150-160 characters
-- Use clear, action-oriented CTA button text
-- Optimize images before uploading (compress, resize)
-- Test pages on mobile devices
+### Document Types
+- Use PascalCase for type names (e.g., `blogPost`, `siteSettings`)
+- Use singular form for document types
 
-### Content Reuse
+### Field Names
+- Use camelCase for field names
+- Be descriptive but concise
+- Use consistent naming across similar fields
 
-- Create reusable sections for consistent messaging
-- Use references for authors and categories
-- Maintain a consistent tone and style
-- Document custom section usage internally
+### Section Types
+- End section type names with "Section" (e.g., `heroSection`, `ctaSection`)
+- Use descriptive names that indicate purpose
 
-## Schema Relationships
+### Object Types
+- Use PascalCase for type names
+- Use descriptive names that indicate function
 
-```
-Page
-└── sections[] (Section types)
-    └── references (e.g., testimonials, logos)
+### Slugs
+- Use kebab-case for slug values
+- Auto-generate from title when possible
+- Ensure uniqueness within document type
 
-BlogPost
-├── author → Author
-├── categories[] → Category[]
-└── body (blockContent with embedded media)
+## Content Guidelines
 
-SiteSettings (singleton)
-├── logo (image)
-├── footerSections[]
-└── socialLinks
+### Images
+- Always provide alternative text for accessibility
+- Use appropriate image formats (WebP for photos, PNG for graphics)
+- Optimize image sizes for web performance
+- Use hotspot cropping for better composition
 
-Category
-└── blogPosts[] (reverse reference)
+### SEO
+- Keep titles under 60 characters
+- Keep descriptions under 160 characters
+- Use descriptive alt text for images
+- Include relevant keywords naturally
 
-Author
-└── blogPosts[] (reverse reference)
-```
+### Portable Text
+- Use proper heading hierarchy (H1-H4)
+- Keep paragraphs concise
+- Use lists for bullet points
+- Add internal links when relevant
+- Use code blocks for technical content
 
-## Content Migration
+### CTAs
+- Use action-oriented text
+- Keep button text concise
+- Ensure sufficient contrast for accessibility
+- Test on different screen sizes
 
-When migrating content from another system:
+## Performance Considerations
 
-1. Export existing content to JSON/CSV
-2. Map old fields to new schema fields
-3. Use Sanity's import tool or custom script
-4. Validate imported content in Studio
-5. Update URLs and internal links
-6. Set up redirects for old URLs
+### Queries
+- Use GROQ projections to limit returned fields
+- Select only required image dimensions
+- Use reference fetching for related content
+- Implement pagination for large content lists
 
-## Further Resources
+### Images
+- Use Sanity's image optimization
+- Implement lazy loading for below-fold images
+- Use appropriate image formats and sizes
+- Consider WebP format for better compression
 
-- [Sanity Schema Documentation](https://www.sanity.io/docs/schema-types)
-- [Block Content Guide](https://www.sanity.io/docs/block-content)
-- [Editing Guide](./editing-guide.md) - For content editors
-- [Architecture Guide](./architecture.md) - For developers
+### Content Structure
+- Keep Portable Text content reasonable length
+- Use reusable sections for repeated content
+- Implement content caching where appropriate
+- Consider incremental static regeneration for dynamic content

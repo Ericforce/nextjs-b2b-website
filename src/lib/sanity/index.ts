@@ -9,3 +9,10 @@ export {
   useCdn,
   basePath,
 } from "./config";
+
+// Export queries
+export * from "./queries";
+
+// Export utilities
+export * from "./constants";
+export * from "./portableText";

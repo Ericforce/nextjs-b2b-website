@@ -69,8 +69,8 @@ export function ContactRequestEmail({
           </Section>
           <Hr style={hr} />
           <Text style={footerText}>
-            This email was sent from your website contact form. To reply,
-            simply respond to this email.
+            This email was sent from your website contact form. To reply, simply
+            respond to this email.
           </Text>
         </Container>
       </Body>

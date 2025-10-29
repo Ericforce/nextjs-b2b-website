@@ -318,33 +318,51 @@ sanity deploy
 
 ### Content Types
 
-- **Pages**: Main site pages (Home, About, etc.)
-- **Blog Posts**: Articles with rich content
-- **Authors**: Blog post authors
-- **Categories**: Blog post organization
-- **Site Settings**: Global site configuration
+- **Pages**: Main site pages with flexible section building
+- **Blog Posts**: Articles with rich Portable Text content
+- **Authors**: Blog post authors with profiles and social links
+- **Categories & Tags**: Blog post organization with color coding
+- **Reusable Sections**: Content sections that can be shared across pages
+- **Site Settings**: Global site configuration (singleton)
 
-### Creating a New Page
+### Content Model Overview
 
+For comprehensive documentation of the content model, including:
+- All document types and their fields
+- Section types and their configurations
+- Object definitions and reusable components
+- Editorial workflows and best practices
+- Naming conventions and content guidelines
+
+See: **[docs/content-model.md](./docs/content-model.md)**
+
+### Quick Start with Content
+
+**Creating a New Page:**
 1. Open Sanity Studio
 2. Navigate to "Pages"
 3. Click "Create" button
-4. Fill in required fields:
-   - Title (e.g., "About Us")
-   - Slug (e.g., "about-us")
-   - SEO metadata
+4. Fill in title and auto-generated slug
 5. Add sections to build page content
-6. Click "Publish"
-7. View at `yourdomain.com/about-us`
+6. Configure SEO settings
+7. Click "Publish"
 
-### Editing Content
+**Creating a Blog Post:**
+1. Navigate to "Blog Posts"
+2. Create new post with title and slug
+3. Write excerpt and set featured image
+4. Use Portable Text editor for rich content
+5. Assign author, categories, and tags
+6. Set published date and SEO
+7. Click "Publish"
 
-1. Open Sanity Studio
-2. Select content type from sidebar
-3. Click on item to edit
-4. Make changes
-5. Click "Publish" to update live site
-6. Changes appear immediately (or after cache revalidation)
+**Managing Site Settings:**
+1. Navigate to "Site Settings" (singleton)
+2. Configure site name, description, URLs
+3. Set up navigation menus
+4. Add social media links
+5. Configure default SEO
+6. Save changes
 
 For detailed editing instructions, see [docs/editing-guide.md](./docs/editing-guide.md).
 

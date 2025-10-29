@@ -13,11 +13,12 @@ const navigationLinkFields = groq`
     ),
     "/"
   ),
+  "reference": reference->{_id, _type, title, "slug": slug.current},
   "openInNewTab": coalesce(openInNewTab, newTab, target == "_blank", false)
 `;
 
 const callToActionFields = groq`
-  "label": coalesce(text, label, title, name),
+  "text": coalesce(text, label, title, name),
   "href": select(
     defined(href) => href,
     defined(link) => link,
@@ -29,6 +30,7 @@ const callToActionFields = groq`
     ),
     "/"
   ),
+  "reference": reference->{_id, _type, title, "slug": slug.current},
   "variant": coalesce(variant, style, theme, "primary"),
   "openInNewTab": coalesce(openInNewTab, newTab, target == "_blank", false)
 `;
@@ -275,11 +277,13 @@ const sectionFields = groq`
 
 export const siteSettingsQuery = groq`
 *[_type == "siteSettings"][0]{
-  "siteName": coalesce(title, name, "Site"),
-  "description": description,
-  "locale": coalesce(locale, "en_US"),
-  "siteUrl": coalesce(siteUrl, url, ""),
-  "email": coalesce(contactEmail, email),
+  _id,
+  _type,
+  title,
+  description,
+  locale,
+  siteUrl,
+  "contactEmail": coalesce(contactEmail, email),
   "updatedAt": coalesce(_updatedAt, _createdAt),
   "logo": select(
     defined(logo.asset) => {
@@ -292,44 +296,25 @@ export const siteSettingsQuery = groq`
   "favicon": select(
     defined(favicon.asset) => favicon.asset->url
   ),
-  "defaultSeo": coalesce(defaultSeo, seo){
+  "defaultSeo": defaultSeo{
     ${seoFields}
   },
-  "navigation": {
-    "main": select(
-      defined(mainNavigation) => mainNavigation[]{
-        ${navigationLinkFields}
-      },
-      defined(navigation.menuItems) => navigation.menuItems[]{
-        ${navigationLinkFields}
-      },
-      defined(navigation) => navigation[]{
-        ${navigationLinkFields}
-      },
-      []
-    ),
-    "secondary": select(
-      defined(secondaryNavigation) => secondaryNavigation[]{
-        ${navigationLinkFields}
-      },
-      defined(utilityNavigation) => utilityNavigation[]{
-        ${navigationLinkFields}
-      },
-      []
-    )
+  "mainNavigation": mainNavigation[]{
+    ${navigationLinkFields}
   },
-  "headerCta": select(
-    defined(headerCTA) => headerCTA{
-      ${callToActionFields}
-    }
-  ),
+  "secondaryNavigation": secondaryNavigation[]{
+    ${navigationLinkFields}
+  },
+  "headerCTA": headerCTA{
+    ${callToActionFields}
+  },
   "footerSections": footerSections[]{
     title,
     links[]{
       ${navigationLinkFields}
     }
   },
-  "social": socialLinks{
+  "socialLinks": socialLinks{
     twitter,
     linkedin,
     github,
@@ -337,7 +322,7 @@ export const siteSettingsQuery = groq`
     facebook,
     instagram
   },
-  "copyrightText": coalesce(copyrightText, copyright)
+  "copyrightText": copyrightText
 }
 `;
 
@@ -380,8 +365,156 @@ export const reusableSectionsQuery = groq`
 *[_type == "reusableSection"]{
   _id,
   title,
+  description,
   "sections": sections[]{
     ${sectionBaseFields}
   }
+}
+`;
+
+export const allBlogPostsQuery = groq`
+*[_type == "blogPost" && defined(slug.current)] | order(publishedAt desc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  excerpt,
+  "featuredImage": select(
+    defined(featuredImage.asset) => {
+      "url": featuredImage.asset->url,
+      "width": featuredImage.asset->metadata.dimensions.width,
+      "height": featuredImage.asset->metadata.dimensions.height,
+      "alt": coalesce(featuredImage.alt, featuredImage.asset->altText)
+    }
+  ),
+  "publishedAt": coalesce(publishedAt, _createdAt),
+  "updatedAt": _updatedAt,
+  "author": author->{_id, name, "slug": slug.current, image},
+  "categories": categories[]->{_id, title, "slug": slug.current, color},
+  "tags": tags[]->{_id, title, "slug": slug.current, color},
+  seo ${seoFields}
+}
+`;
+
+export const blogPostSlugsQuery = groq`
+*[_type == "blogPost" && defined(slug.current)]{
+  "slug": slug.current
+}
+`;
+
+export const blogPostBySlugQuery = groq`
+*[_type == "blogPost" && slug.current == $slug][0]{
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  excerpt,
+  "featuredImage": select(
+    defined(featuredImage.asset) => {
+      "url": featuredImage.asset->url,
+      "width": featuredImage.asset->metadata.dimensions.width,
+      "height": featuredImage.asset->metadata.dimensions.height,
+      "alt": coalesce(featuredImage.alt, featuredImage.asset->altText)
+    }
+  ),
+  body[]{
+    ...,
+    markDefs[]{
+      ...,
+      _type == "linkInternal" => {
+        ...,
+        "reference": reference->{_id, _type, title, "slug": slug.current}
+      }
+    }
+  },
+  "publishedAt": coalesce(publishedAt, _createdAt),
+  "createdAt": _createdAt,
+  "updatedAt": _updatedAt,
+  "author": author->{_id, name, "slug": slug.current, bio, image, website, email, socialLinks},
+  "categories": categories[]->{_id, title, "slug": slug.current, description, color, icon},
+  "tags": tags[]->{_id, title, "slug": slug.current, description, color},
+  seo ${seoFields}
+}
+`;
+
+export const allAuthorsQuery = groq`
+*[_type == "author" && defined(slug.current)] | order(name asc){
+  _id,
+  name,
+  "slug": slug.current,
+  bio,
+  "image": select(
+    defined(image.asset) => {
+      "url": image.asset->url,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      "alt": coalesce(image.alt, image.asset->altText)
+    }
+  ),
+  website,
+  email,
+  socialLinks
+}
+`;
+
+export const authorBySlugQuery = groq`
+*[_type == "author" && slug.current == $slug][0]{
+  _id,
+  name,
+  "slug": slug.current,
+  bio,
+  "image": select(
+    defined(image.asset) => {
+      "url": image.asset->url,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      "alt": coalesce(image.alt, image.asset->altText)
+    }
+  ),
+  website,
+  email,
+  socialLinks
+}
+`;
+
+export const allCategoriesQuery = groq`
+*[_type == "category" && defined(slug.current)] | order(title asc){
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  color,
+  icon
+}
+`;
+
+export const categoryBySlugQuery = groq`
+*[_type == "category" && slug.current == $slug][0]{
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  color,
+  icon
+}
+`;
+
+export const allTagsQuery = groq`
+*[_type == "tag" && defined(slug.current)] | order(title asc){
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  color
+}
+`;
+
+export const tagBySlugQuery = groq`
+*[_type == "tag" && slug.current == $slug][0]{
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  color
 }
 `;

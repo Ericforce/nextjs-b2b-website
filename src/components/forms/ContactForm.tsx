@@ -101,11 +101,7 @@ export default function ContactForm({ className }: ContactFormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className={className}
-      noValidate
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className={className} noValidate>
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Input
@@ -225,9 +221,7 @@ export default function ContactForm({ className }: ContactFormProps) {
             role="alert"
             aria-live="polite"
           >
-            <p className="text-sm font-medium text-red-800">
-              ✗ {errorMessage}
-            </p>
+            <p className="text-sm font-medium text-red-800">✗ {errorMessage}</p>
           </div>
         )}
 
