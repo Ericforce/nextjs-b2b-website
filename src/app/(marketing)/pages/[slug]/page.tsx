@@ -49,19 +49,13 @@ export default async function MarketingPage({ params }: PageProps) {
   const { siteSettings } = await getMetadataDefaults();
   const canonicalUrl = absoluteUrl(
     page.seo?.canonical ?? `/${page.slug}`,
-    siteSettings.siteUrl,
+    siteSettings.siteUrl
   );
-  const jsonLd = buildWebPageJsonLd(
-    page,
-    canonicalUrl,
-    siteSettings,
-  );
+  const jsonLd = buildWebPageJsonLd(page, canonicalUrl, siteSettings);
 
   return (
     <>
-      <Script
-        {...jsonLdScriptProps(`page-jsonld-${page.slug}`, jsonLd)}
-      />
+      <Script {...jsonLdScriptProps(`page-jsonld-${page.slug}`, jsonLd)} />
       <article className="container-custom mx-auto max-w-3xl py-16 lg:py-24">
         <header className="space-y-4">
           <p className="text-sm uppercase tracking-wide text-primary-600">
@@ -73,9 +67,7 @@ export default async function MarketingPage({ params }: PageProps) {
           <p className="text-lg text-secondary-600">{page.description}</p>
         </header>
 
-        <div className="mt-12 space-y-8">
-          {renderPortableText(page.body)}
-        </div>
+        <div className="mt-12 space-y-8">{renderPortableText(page.body)}</div>
       </article>
     </>
   );

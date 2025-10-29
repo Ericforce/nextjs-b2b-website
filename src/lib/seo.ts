@@ -22,15 +22,14 @@ const OG_DEFAULT_HEIGHT = 630;
 const buildDefaults = cache(async (): Promise<MetadataDefaults> => {
   const siteSettings = await getSiteSettings();
   const baseUrl = getSiteBaseUrl(siteSettings);
-  const defaultTitle =
-    siteSettings.defaultSeo.title ?? siteSettings.siteName;
+  const defaultTitle = siteSettings.defaultSeo.title ?? siteSettings.siteName;
   const description =
     siteSettings.defaultSeo.description ?? siteSettings.description;
 
   const ogImage = resolveOpenGraphImage(
     siteSettings.defaultSeo.ogImage,
     siteSettings.defaultSeo.ogTitle ?? defaultTitle,
-    baseUrl,
+    baseUrl
   );
 
   const metadata: Metadata = {
@@ -58,12 +57,11 @@ const buildDefaults = cache(async (): Promise<MetadataDefaults> => {
       card: "summary_large_image",
       site: formatTwitterHandle(siteSettings.social?.twitter),
       title: siteSettings.defaultSeo.twitterTitle ?? defaultTitle,
-      description:
-        siteSettings.defaultSeo.twitterDescription ?? description,
+      description: siteSettings.defaultSeo.twitterDescription ?? description,
       images: [
         absoluteUrl(
           siteSettings.defaultSeo.twitterImage?.url ?? ogImage.url,
-          baseUrl,
+          baseUrl
         ),
       ],
     },
@@ -93,7 +91,7 @@ export interface GeneratePageMetadataInput {
 }
 
 export async function generatePageMetadata(
-  input: GeneratePageMetadataInput,
+  input: GeneratePageMetadataInput
 ): Promise<Metadata> {
   const { metadata: defaults, siteSettings } = await getMetadataDefaults();
   const baseUrl = getSiteBaseUrl(siteSettings);
@@ -102,7 +100,7 @@ export async function generatePageMetadata(
   const baseTitle =
     typeof defaults.title === "string"
       ? defaults.title
-      : defaults.title?.default ?? siteSettings.siteName;
+      : (defaults.title?.default ?? siteSettings.siteName);
   const title = overriddenTitle ?? baseTitle;
 
   const description =
@@ -110,18 +108,18 @@ export async function generatePageMetadata(
 
   const canonical = absoluteUrl(
     input.seo?.canonical ?? input.canonicalPath ?? "/",
-    baseUrl,
+    baseUrl
   );
 
   const openGraphImage = resolveOpenGraphImage(
     input.seo?.ogImage ?? siteSettings.defaultSeo.ogImage,
     input.seo?.ogTitle ?? title,
-    baseUrl,
+    baseUrl
   );
 
   const twitterImage = absoluteUrl(
     input.seo?.twitterImage?.url ?? openGraphImage.url,
-    baseUrl,
+    baseUrl
   );
 
   const mergedOpenGraph = {
@@ -186,7 +184,7 @@ export function buildHomePageJsonLd(site: SiteSettings) {
 export function buildWebPageJsonLd(
   page: PageDocument,
   canonicalUrl: string,
-  site: SiteSettings,
+  site: SiteSettings
 ) {
   return {
     "@context": "https://schema.org",
@@ -208,12 +206,12 @@ export function buildWebPageJsonLd(
 export function buildArticleJsonLd(
   post: BlogPostDocument,
   canonicalUrl: string,
-  site: SiteSettings,
+  site: SiteSettings
 ) {
   const baseUrl = getSiteBaseUrl(site);
   const imageUrl = absoluteUrl(
     post.featuredImage?.url ?? site.defaultSeo.ogImage?.url,
-    baseUrl,
+    baseUrl
   );
 
   return {
@@ -280,7 +278,7 @@ export function buildOgImageUrl(params: {
 
 export function absoluteUrl(
   path: string | URL | undefined,
-  base?: string,
+  base?: string
 ): string {
   if (!path) {
     return base ?? env.app.url;
@@ -310,7 +308,7 @@ function isAbsoluteUrl(value: string) {
   try {
     new URL(value);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -318,7 +316,7 @@ function isAbsoluteUrl(value: string) {
 function resolveOpenGraphImage(
   image: SeoImage | undefined,
   fallbackTitle: string,
-  baseUrl: string,
+  baseUrl: string
 ) {
   const fallbackUrl = buildOgImageUrl({ title: fallbackTitle });
   return {
