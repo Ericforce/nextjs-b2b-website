@@ -10,6 +10,7 @@ export const env = {
   },
   email: {
     from: process.env.EMAIL_FROM || "",
+    to: process.env.CONTACT_EMAIL_RECIPIENT || "",
     apiKey: process.env.EMAIL_PROVIDER_API_KEY || "",
   },
   smtp: {

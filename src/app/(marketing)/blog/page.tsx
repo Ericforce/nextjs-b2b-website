@@ -11,7 +11,7 @@ import {
 } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { siteSettings } = await getMetadataDefaults();
+  await getMetadataDefaults();
   return generatePageMetadata({
     title: "Insights from the Next.js B2B Team",
     description:
@@ -24,7 +24,7 @@ export default async function BlogIndexPage() {
   const posts = await getAllBlogPosts();
   const orderedPosts = [...posts].sort(
     (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   );
   const { siteSettings } = await getMetadataDefaults();
   const canonical = absoluteUrl("/blog", siteSettings.siteUrl);
