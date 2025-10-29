@@ -15,6 +15,7 @@ export const env = {
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
     apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-01-01",
     apiToken: process.env.SANITY_API_TOKEN || "",
+    previewSecret: process.env.SANITY_PREVIEW_SECRET || "",
   },
   resend: {
     apiKey: requireEnv("RESEND_API_KEY", process.env.RESEND_API_KEY),
