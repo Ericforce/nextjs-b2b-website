@@ -1,15 +1,27 @@
 export type {
-  NavigationItem,
-  FooterLink,
-  FooterSection,
-} from "@/data/navigation";
-
-export type {
+  SanityImageAsset,
   SeoFields,
   SeoImage,
   SiteSettings,
   SiteSocialLinks,
+  NavigationLink,
+  FooterLink,
+  FooterSection,
+  CallToAction,
+  SiteNavigation,
   PageDocument,
+  PageSection,
+  HeroSection,
+  FeatureGridSection,
+  CallToActionSection,
+  TestimonialsSection,
+  RichTextSection,
+  FaqSection,
+  StatsSection,
+  LogoCloudSection,
+  ContactSection,
+  ReusableSection,
+  ReusableSectionReference,
   BlogPostDocument,
   BlogAuthor,
 } from "./sanity";
