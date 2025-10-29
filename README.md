@@ -197,9 +197,10 @@ NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id    # From Sanity dashboard
 NEXT_PUBLIC_SANITY_DATASET=production             # Usually 'production'
 SANITY_API_TOKEN=your_api_token                   # Create in Sanity dashboard
 
-# Email Configuration
-EMAIL_FROM=noreply@yourdomain.com                 # Sender email address
-EMAIL_PROVIDER_API_KEY=your_email_api_key         # Resend/SendGrid API key
+# Resend Email Configuration (Required for contact form)
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxx       # Your Resend API key
+RESEND_FROM_EMAIL=noreply@yourdomain.com           # Verified sender email
+CONTACT_RECIPIENT_EMAIL=contact@yourdomain.com     # Where to send contact form submissions
 ```
 
 ### Optional Variables
@@ -207,12 +208,6 @@ EMAIL_PROVIDER_API_KEY=your_email_api_key         # Resend/SendGrid API key
 ```bash
 # Environment
 NODE_ENV=development
-
-# SMTP Configuration (alternative to email provider)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your_smtp_username
-SMTP_PASSWORD=your_smtp_password
 
 # Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
@@ -229,15 +224,16 @@ SANITY_PREVIEW_SECRET=your_preview_secret
 3. Navigate to API → Tokens
 4. Create new token with "Editor" permissions
 
-**Resend:**
+**Resend (Recommended for contact form):**
 1. Sign up at [resend.com](https://resend.com)
-2. Verify your domain
-3. Create API key in dashboard
+2. Verify your domain or use the free testing domain (@onboarding.resend.dev)
+3. Create an API key in the dashboard
+4. Set `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `CONTACT_RECIPIENT_EMAIL` in `.env.local`
 
-**SendGrid (Alternative):**
-1. Sign up at [sendgrid.com](https://sendgrid.com)
-2. Verify sender identity
-3. Create API key with "Mail Send" permissions
+**Testing Contact Form Locally:**
+- In development, you can use Resend's test domain: `onboarding@resend.dev`
+- To test without sending real emails, you can temporarily disable the email send in the API route
+- Check the server console for logs of contact form submissions
 
 For detailed environment setup, see [docs/operations.md](./docs/operations.md).
 
@@ -445,9 +441,17 @@ Comprehensive guides are available in the `docs/` directory:
 - Ensure Sanity CDN is enabled
 
 **Rate Limit Errors:**
-- Wait a few minutes before retrying
-- Check rate limit configuration
+- Wait a few minutes before retrying (default: 3 requests per minute per IP)
+- Check rate limit configuration in `src/lib/utils/rate-limit.ts`
+- Note: Rate limiting uses in-memory storage and resets on server restart
 - Contact admin if persistent
+
+**Contact Form Issues:**
+- Ensure Resend environment variables are set correctly
+- Verify sender email is verified in Resend dashboard
+- Check server logs for detailed error messages
+- Test with valid email addresses only
+- Ensure honeypot field is not being filled (indicates bot)
 
 For more solutions, see:
 - [docs/operations.md#troubleshooting](./docs/operations.md#troubleshooting)
