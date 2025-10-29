@@ -8,16 +8,24 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\""
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "sanity": "sanity dev",
+    "sanity:manage": "sanity manage"
   },
   "dependencies": {
+    "@sanity/client": "^6.29.1",
+    "@sanity/image-url": "^1.2.0",
     "clsx": "^2.1.1",
     "next": "14.2.33",
+    "next-sanity": "^9.12.3",
     "react": "^18",
     "react-dom": "^18",
+    "sanity": "^3.99.0",
+    "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@sanity/vision": "^4.12.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

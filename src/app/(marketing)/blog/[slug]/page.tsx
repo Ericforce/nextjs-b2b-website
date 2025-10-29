@@ -53,7 +53,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { siteSettings } = await getMetadataDefaults();
   const canonicalUrl = absoluteUrl(
     post.seo?.canonical ?? `/blog/${post.slug}`,
-    siteSettings.siteUrl,
+    siteSettings.siteUrl
   );
   const jsonLd = buildArticleJsonLd(post, canonicalUrl, siteSettings);
 
@@ -83,9 +83,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </header>
 
-        <div className="mt-12 space-y-8">
-          {renderPortableText(post.body)}
-        </div>
+        <div className="mt-12 space-y-8">{renderPortableText(post.body)}</div>
       </article>
     </>
   );

@@ -14,20 +14,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteBaseUrl(siteSettings);
 
   const pagePaths = new Set(
-    pages.map((page) => normalizePath(page.seo?.canonical ?? `/${page.slug}`)),
+    pages.map((page) => normalizePath(page.seo?.canonical ?? `/${page.slug}`))
   );
   const postPaths = new Set(
     posts.map((post) =>
-      normalizePath(post.seo?.canonical ?? `/blog/${post.slug}`),
-    ),
+      normalizePath(post.seo?.canonical ?? `/blog/${post.slug}`)
+    )
   );
 
   const staticRoutes = Array.from(
-    new Set([
-      "/",
-      ...Object.values(ROUTES),
-      "/blog",
-    ]),
+    new Set(["/", ...Object.values(ROUTES), "/blog"])
   )
     .map((route) => normalizePath(route))
     .filter((route) => !pagePaths.has(route) && !postPaths.has(route));
@@ -54,7 +50,7 @@ function normalizePath(path: string) {
   try {
     const url = new URL(path);
     return url.pathname === "" ? "/" : url.pathname;
-  } catch (error) {
+  } catch {
     if (!path.startsWith("/")) {
       return `/${path}`;
     }
