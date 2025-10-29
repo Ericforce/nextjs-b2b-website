@@ -1,26 +1,55 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { navigationItems } from "@/data/navigation";
+import { navigationItems as fallbackNavigationItems } from "@/data/navigation";
+import type { SanitySiteSettings } from "@/types/sanity";
 
-export default function Header() {
+interface HeaderProps {
+  settings?: SanitySiteSettings;
+}
+
+export default function Header({ settings }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const branding = settings?.branding || {
+    name: "B2B App",
+    href: "/",
+  };
+
+  const navItems = settings?.navigation?.items || fallbackNavigationItems;
+  const navCta = settings?.navigation?.cta;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="container-custom">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-primary-600"></div>
-              <span className="text-xl font-bold text-secondary-900">
-                B2B App
-              </span>
+            <Link
+              href={branding.href || "/"}
+              className="flex items-center space-x-2"
+            >
+              {branding.logo?.url ? (
+                <Image
+                  src={branding.logo.url}
+                  alt={branding.logo.alt || branding.name || "Logo"}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded-lg bg-primary-600"></div>
+              )}
+              {branding.name ? (
+                <span className="text-xl font-bold text-secondary-900">
+                  {branding.name}
+                </span>
+              ) : null}
             </Link>
 
             <div className="hidden md:flex md:gap-6">
-              {navigationItems.map((item) => (
+              {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -39,9 +68,15 @@ export default function Header() {
             >
               Log in
             </Link>
-            <Link href="/signup" className="btn-primary">
-              Get Started
-            </Link>
+            {navCta ? (
+              <Link href={navCta.href || "/signup"} className="btn-primary">
+                {navCta.label || "Get Started"}
+              </Link>
+            ) : (
+              <Link href="/signup" className="btn-primary">
+                Get Started
+              </Link>
+            )}
           </div>
 
           <button
@@ -78,7 +113,7 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="border-t border-neutral-200 py-4 md:hidden">
             <div className="flex flex-col gap-4">
-              {navigationItems.map((item) => (
+              {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -96,13 +131,23 @@ export default function Header() {
                 >
                   Log in
                 </Link>
-                <Link
-                  href="/signup"
-                  className="btn-primary text-center"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Get Started
-                </Link>
+                {navCta ? (
+                  <Link
+                    href={navCta.href || "/signup"}
+                    className="btn-primary text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {navCta.label || "Get Started"}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/signup"
+                    className="btn-primary text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                )}
               </div>
             </div>
           </div>
