@@ -2,7 +2,7 @@ import type { BlogPostDocument } from "@/types";
 
 export const posts: BlogPostDocument[] = [
   {
-    _type: "post",
+    _type: "blogPost",
     slug: "announcing-analytics-suite",
     title: "Announcing the Next.js B2B Analytics Suite",
     excerpt:
@@ -50,7 +50,7 @@ All enterprise customers can access the analytics suite starting today.`,
     },
   },
   {
-    _type: "post",
+    _type: "blogPost",
     slug: "scaling-with-automation",
     title: "How Automation Helps Revenue Teams Scale",
     excerpt:

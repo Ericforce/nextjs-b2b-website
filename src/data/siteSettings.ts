@@ -4,9 +4,9 @@ export const siteSettings: SiteSettings = {
   siteName: "Next.js B2B Application",
   description:
     "A modern B2B application that helps enterprise teams streamline their operations and drive predictable growth.",
-  locale: "en_US",
+  locale: "en-US",
   siteUrl: "http://localhost:3000",
-  email: "hello@nextjsb2b.com",
+  contactEmail: "hello@nextjsb2b.com",
   favicon: "/favicon.ico",
   logo: "/logo.svg",
   updatedAt: "2024-10-15T12:00:00.000Z",
