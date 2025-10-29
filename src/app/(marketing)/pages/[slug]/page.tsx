@@ -10,6 +10,8 @@ import {
   getMetadataDefaults,
   jsonLdScriptProps,
 } from "@/lib/seo";
+import ContactForm from "@/components/forms/ContactForm";
+import { env } from "@/lib/env";
 
 interface PageProps {
   params: {
@@ -53,6 +55,8 @@ export default async function MarketingPage({ params }: PageProps) {
   );
   const jsonLd = buildWebPageJsonLd(page, canonicalUrl, siteSettings);
 
+  const isContactPage = page.slug === "contact";
+
   return (
     <>
       <Script {...jsonLdScriptProps(`page-jsonld-${page.slug}`, jsonLd)} />
@@ -68,6 +72,17 @@ export default async function MarketingPage({ params }: PageProps) {
         </header>
 
         <div className="mt-12 space-y-8">{renderPortableText(page.body)}</div>
+
+        {isContactPage && (
+          <div className="mt-16">
+            <div className="rounded-lg bg-secondary-50 p-8 lg:p-12">
+              <h2 className="text-2xl font-semibold text-secondary-900 mb-6">
+                Send us a message
+              </h2>
+              <ContactForm />
+            </div>
+          </div>
+        )}
       </article>
     </>
   );

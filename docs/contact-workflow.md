@@ -2,6 +2,25 @@
 
 This guide explains how the contact form system works, including email delivery, spam protection, and troubleshooting.
 
+## Current Implementation
+
+The contact form is **fully implemented** using:
+- **React Hook Form** for client-side form management
+- **Zod** for schema validation (client and server)
+- **Resend** for email delivery with React Email templates
+- **In-memory rate limiting** (3 requests per minute per IP)
+- **Honeypot field** for spam bot detection
+- **Consent checkbox** for GDPR compliance
+
+**Location:** The contact form automatically appears on the `/contact` page.
+
+**Files:**
+- Form component: `src/components/forms/ContactForm.tsx`
+- API route: `src/app/api/contact/route.ts`
+- Email template: `src/emails/contact-request.tsx`
+- Rate limiting: `src/lib/utils/rate-limit.ts`
+- Resend client: `src/lib/email/resend.ts`
+
 ## Overview
 
 The contact form allows visitors to send messages to your team. When a user submits the form:
@@ -837,39 +856,84 @@ const rateLimitResult = await rateLimit(ip, {
 ### Environment Variables
 
 ```bash
-# Required for email sending
-EMAIL_FROM=noreply@yourdomain.com
-EMAIL_PROVIDER_API_KEY=re_xxxxx
+# Required for email sending via Resend
+RESEND_API_KEY=re_xxxxx                         # Your Resend API key
+RESEND_FROM_EMAIL=noreply@yourdomain.com        # Verified sender email
+CONTACT_RECIPIENT_EMAIL=contact@yourdomain.com  # Where to receive submissions
 
-# Optional: SMTP fallback
-SMTP_HOST=smtp.provider.com
-SMTP_PORT=587
-SMTP_USER=username
-SMTP_PASSWORD=password
-
-# Optional: reCAPTCHA
-NEXT_PUBLIC_RECAPTCHA_SITE_KEY=6Lxxxxx
-RECAPTCHA_SECRET_KEY=6Lxxxxx
+# Application URL
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
+
+### Setting Up Resend
+
+1. **Sign up** at [resend.com](https://resend.com)
+2. **Verify your domain**:
+   - Go to Domains in dashboard
+   - Add your domain
+   - Add DNS records (SPF, DKIM, DMARC)
+   - Wait for verification
+3. **Create API Key**:
+   - Go to API Keys
+   - Create new key
+   - Copy to `RESEND_API_KEY`
+4. **Test email**:
+   - Use verified domain for `RESEND_FROM_EMAIL`
+   - Set your email as `CONTACT_RECIPIENT_EMAIL`
+   - Submit test form
+
+**For Development:**
+- Use Resend's test domain: `onboarding@resend.dev`
+- Emails sent from test domain only go to your verified account email
+- No DNS setup required for testing
 
 ### Rate Limit Settings
 
+The rate limiter uses **in-memory storage** with the following defaults:
+
 ```typescript
-// Adjust in lib/utils/rate-limit.ts
-const options = {
-  windowMs: 60000, // Time window (1 minute)
-  max: 3, // Max requests per window
-};
+// Default configuration in src/lib/utils/rate-limit.ts
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;  // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 3;       // 3 submissions per IP
+
+// Adjust when calling rateLimit():
+rateLimit(identifier, {
+  windowMs: 120000,  // 2 minutes
+  maxRequests: 5,    // 5 submissions
+});
 ```
+
+**Important Notes:**
+- Rate limits are stored in memory and reset on server restart
+- For production with multiple servers, consider Redis-based rate limiting
+- Rate limit is per IP address (using `x-forwarded-for` header)
+- Cleanup runs every 60 seconds to remove expired entries
 
 ### Spam Detection
 
-```typescript
-// Adjust thresholds in API route
-const spamThreshold = 0.5; // reCAPTCHA score
-const maxMessageLength = 1000; // Characters
-const minMessageLength = 10; // Characters
-```
+Current implementation includes:
+
+1. **Honeypot Field**: Hidden field that bots typically fill
+   - Located in `ContactForm.tsx` with `aria-hidden` and off-screen positioning
+   - If filled, API returns fake success response
+
+2. **Validation Limits**:
+   ```typescript
+   // Defined in Zod schema (src/app/api/contact/route.ts)
+   name: max 100 characters
+   email: valid email format required
+   company: max 100 characters (optional)
+   phone: max 20 characters (optional)
+   message: min 10, max 2000 characters
+   consent: must be true
+   ```
+
+3. **Rate Limiting**: 3 submissions per minute per IP
+
+**Future Enhancements:**
+- Add reCAPTCHA v3 for advanced bot detection
+- Implement content-based spam filtering
+- Add IP blacklisting for repeat offenders
 
 ## Further Resources
 
