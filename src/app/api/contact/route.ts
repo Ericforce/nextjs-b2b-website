@@ -129,10 +129,7 @@ To reply, simply respond to this email.
 
     if (error instanceof z.ZodError) {
       const firstError = error.errors[0];
-      return NextResponse.json(
-        { error: firstError.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: firstError.message }, { status: 400 });
     }
 
     if (error instanceof Error) {

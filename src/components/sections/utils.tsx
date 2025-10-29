@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -70,12 +71,15 @@ const SECTION_BACKGROUND_MAP: Record<string, SectionBackgroundPalette> = {
   },
 };
 
-const SECTION_BACKGROUND_ALIASES: Record<string, keyof typeof SECTION_BACKGROUND_MAP> = {
+const SECTION_BACKGROUND_ALIASES: Record<
+  string,
+  keyof typeof SECTION_BACKGROUND_MAP
+> = {
   default: "default",
   white: "default",
   "bg-white": "default",
   light: "light",
-  "neutral": "light",
+  neutral: "light",
   "neutral-50": "light",
   "bg-neutral-50": "light",
   subtle: "soft",
@@ -161,11 +165,13 @@ const CTA_VARIANT_CLASSES: Record<
     dark: "inline-flex items-center justify-center rounded-lg border border-white/40 px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-white/10",
   },
   ghost: {
-    light: "inline-flex items-center justify-center rounded-lg border border-secondary-300 px-6 py-2.5 text-base font-medium text-secondary-700 transition-colors hover:bg-secondary-50",
+    light:
+      "inline-flex items-center justify-center rounded-lg border border-secondary-300 px-6 py-2.5 text-base font-medium text-secondary-700 transition-colors hover:bg-secondary-50",
     dark: "inline-flex items-center justify-center rounded-lg border border-white/30 px-6 py-2.5 text-base font-medium text-white transition-colors hover:bg-white/10",
   },
   link: {
-    light: "inline-flex items-center gap-2 text-base font-medium text-primary-600 transition-colors hover:text-primary-700",
+    light:
+      "inline-flex items-center gap-2 text-base font-medium text-primary-600 transition-colors hover:text-primary-700",
     dark: "inline-flex items-center gap-2 text-base font-medium text-primary-100 transition-colors hover:text-white",
   },
 };
@@ -185,9 +191,12 @@ export function CtaLink({
     return null;
   }
 
-  const variant = (cta.variant ?? "primary") as keyof typeof CTA_VARIANT_CLASSES;
-  const variantClasses = CTA_VARIANT_CLASSES[variant] ?? CTA_VARIANT_CLASSES.primary;
-  const baseClass = tone === "dark" ? variantClasses.dark : variantClasses.light;
+  const variant = (cta.variant ??
+    "primary") as keyof typeof CTA_VARIANT_CLASSES;
+  const variantClasses =
+    CTA_VARIANT_CLASSES[variant] ?? CTA_VARIANT_CLASSES.primary;
+  const baseClass =
+    tone === "dark" ? variantClasses.dark : variantClasses.light;
 
   return (
     <Link

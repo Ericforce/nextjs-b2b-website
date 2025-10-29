@@ -27,7 +27,10 @@ export function TestimonialsSection(section: TestimonialsSectionType) {
     "flex h-full min-h-[260px] flex-col gap-4 rounded-2xl border border-neutral-200 bg-white/95 p-6 shadow-soft";
 
   return (
-    <section id={anchor || undefined} className="bg-neutral-50 py-16 sm:py-20 lg:py-24">
+    <section
+      id={anchor || undefined}
+      className="bg-neutral-50 py-16 sm:py-20 lg:py-24"
+    >
       <div className="container-custom">
         <div className="mx-auto max-w-3xl text-center">
           {headline ? (
@@ -42,9 +45,12 @@ export function TestimonialsSection(section: TestimonialsSectionType) {
 
         <div className={containerClasses}>
           {testimonials.map((testimonial, index) => {
-            const key = testimonial._key ?? `${testimonial.author ?? "testimonial"}-${index}`;
+            const key =
+              testimonial._key ??
+              `${testimonial.author ?? "testimonial"}-${index}`;
             const rating = Math.max(0, Math.min(5, testimonial.rating ?? 0));
-            const CardTag = resolvedLayout === "single" ? "article" : "blockquote";
+            const CardTag =
+              resolvedLayout === "single" ? "article" : "blockquote";
 
             return (
               <CardTag
@@ -54,8 +60,8 @@ export function TestimonialsSection(section: TestimonialsSectionType) {
                   resolvedLayout === "carousel"
                     ? "min-w-[320px] max-w-sm shrink-0"
                     : resolvedLayout === "single"
-                    ? "mx-auto max-w-3xl"
-                    : ""
+                      ? "mx-auto max-w-3xl"
+                      : ""
                 )}
               >
                 {rating > 0 ? (

@@ -31,7 +31,12 @@ export function FeatureGridSection(section: FeatureGridSectionType) {
       <div className="container-custom">
         <div className="mx-auto max-w-3xl text-center">
           {headline ? (
-            <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+            <h2
+              className={cn(
+                "text-3xl font-semibold sm:text-4xl",
+                palette.heading
+              )}
+            >
               {headline}
             </h2>
           ) : null}
@@ -43,7 +48,8 @@ export function FeatureGridSection(section: FeatureGridSectionType) {
         {features && features.length > 0 ? (
           <div className={cn("mt-12 grid grid-cols-1 gap-8", gridColumns)}>
             {features.map((feature, index) => {
-              const key = feature._key ?? `${feature.title ?? "feature"}-${index}`;
+              const key =
+                feature._key ?? `${feature.title ?? "feature"}-${index}`;
               return (
                 <div
                   key={key}
@@ -87,7 +93,9 @@ export function FeatureGridSection(section: FeatureGridSectionType) {
                     <p
                       className={cn(
                         "text-base leading-7",
-                        palette.isDark ? "text-secondary-200" : "text-secondary-600"
+                        palette.isDark
+                          ? "text-secondary-200"
+                          : "text-secondary-600"
                       )}
                     >
                       {feature.description}

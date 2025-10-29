@@ -69,7 +69,8 @@ export function SectionRenderer({ sections }: SectionRendererProps) {
       }
 
       if (isReusableSection(section)) {
-        const reusableKey = section._key ?? `reusable-${ancestry.join("-")}-${index}`;
+        const reusableKey =
+          section._key ?? `reusable-${ancestry.join("-")}-${index}`;
         if (visited.has(reusableKey)) {
           warn("Detected circular reusable section", reusableKey);
           return [];
@@ -117,7 +118,8 @@ export function SectionRenderer({ sections }: SectionRendererProps) {
         return [];
       }
 
-      const key = section._key ?? `${section._type}-${index}-${ancestry.join("-")}`;
+      const key =
+        section._key ?? `${section._type}-${index}-${ancestry.join("-")}`;
 
       return [<Component key={key} {...section} />];
     });

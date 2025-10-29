@@ -22,7 +22,8 @@ function resolveRedirectPath(rawSlug?: string | null): string {
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const secret = url.searchParams.get("secret");
-  const slugParam = url.searchParams.get("slug") ?? url.searchParams.get("path");
+  const slugParam =
+    url.searchParams.get("slug") ?? url.searchParams.get("path");
 
   if (!env.sanity.previewSecret) {
     return NextResponse.json(
@@ -32,7 +33,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (secret !== env.sanity.previewSecret) {
-    return NextResponse.json({ message: "Invalid preview token." }, { status: 401 });
+    return NextResponse.json(
+      { message: "Invalid preview token." },
+      { status: 401 }
+    );
   }
 
   const redirectPath = resolveRedirectPath(slugParam);

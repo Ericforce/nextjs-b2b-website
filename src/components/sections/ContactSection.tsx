@@ -29,13 +29,23 @@ export function ContactSection(section: ContactSectionType) {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
           <div className="flex flex-col gap-6">
             {eyebrow ? (
-              <p className={cn("text-sm font-semibold uppercase tracking-[0.35em]", palette.eyebrow)}>
+              <p
+                className={cn(
+                  "text-sm font-semibold uppercase tracking-[0.35em]",
+                  palette.eyebrow
+                )}
+              >
                 {eyebrow}
               </p>
             ) : null}
 
             {headline ? (
-              <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+              <h2
+                className={cn(
+                  "text-3xl font-semibold sm:text-4xl",
+                  palette.heading
+                )}
+              >
                 {headline}
               </h2>
             ) : null}
@@ -47,14 +57,17 @@ export function ContactSection(section: ContactSectionType) {
             {contactDetails && contactDetails.length > 0 ? (
               <ul className="mt-4 space-y-4">
                 {contactDetails.map((detail, index) => {
-                  const key = detail._key ?? `${detail.label ?? "detail"}-${index}`;
+                  const key =
+                    detail._key ?? `${detail.label ?? "detail"}-${index}`;
                   const content = (
                     <div className="flex flex-col">
                       {detail.label ? (
                         <span
                           className={cn(
                             "text-sm font-medium uppercase tracking-wide",
-                            palette.isDark ? "text-secondary-200" : "text-secondary-500"
+                            palette.isDark
+                              ? "text-secondary-200"
+                              : "text-secondary-500"
                           )}
                         >
                           {detail.label}
@@ -92,8 +105,16 @@ export function ContactSection(section: ContactSectionType) {
                         <Link
                           href={detail.href}
                           className="flex-1"
-                          target={detail.href.startsWith("http") ? "_blank" : undefined}
-                          rel={detail.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                          target={
+                            detail.href.startsWith("http")
+                              ? "_blank"
+                              : undefined
+                          }
+                          rel={
+                            detail.href.startsWith("http")
+                              ? "noopener noreferrer"
+                              : undefined
+                          }
                         >
                           {content}
                         </Link>

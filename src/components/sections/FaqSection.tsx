@@ -25,7 +25,12 @@ export function FaqSection(section: FaqSectionType) {
       <div className="container-custom">
         <div className="mx-auto max-w-3xl text-center">
           {headline ? (
-            <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+            <h2
+              className={cn(
+                "text-3xl font-semibold sm:text-4xl",
+                palette.heading
+              )}
+            >
               {headline}
             </h2>
           ) : null}
@@ -45,7 +50,9 @@ export function FaqSection(section: FaqSectionType) {
                 key={key}
                 className={cn(
                   "group rounded-2xl border bg-white/95 p-6 shadow-soft transition",
-                  palette.isDark ? "border-white/10 bg-secondary-900/40" : "border-neutral-200"
+                  palette.isDark
+                    ? "border-white/10 bg-secondary-900/40"
+                    : "border-neutral-200"
                 )}
               >
                 <summary

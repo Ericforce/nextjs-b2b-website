@@ -17,7 +17,10 @@ interface HeaderProps {
 const CTA_BASE_CLASSES =
   "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors";
 
-const CTA_VARIANT_CLASSES: Record<NonNullable<CallToAction["variant"]>, string> = {
+const CTA_VARIANT_CLASSES: Record<
+  NonNullable<CallToAction["variant"]>,
+  string
+> = {
   primary: cn(CTA_BASE_CLASSES, "btn-primary text-base"),
   secondary: cn(
     CTA_BASE_CLASSES,

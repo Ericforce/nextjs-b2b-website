@@ -22,7 +22,12 @@ export function StatsSection(section: StatsSectionType) {
       <div className="container-custom">
         <div className="mx-auto max-w-3xl text-center">
           {headline ? (
-            <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+            <h2
+              className={cn(
+                "text-3xl font-semibold sm:text-4xl",
+                palette.heading
+              )}
+            >
               {headline}
             </h2>
           ) : null}
@@ -66,7 +71,9 @@ export function StatsSection(section: StatsSectionType) {
                   <dt
                     className={cn(
                       "mt-2 text-sm uppercase tracking-wider",
-                      palette.isDark ? "text-secondary-300" : "text-secondary-500"
+                      palette.isDark
+                        ? "text-secondary-300"
+                        : "text-secondary-500"
                     )}
                   >
                     {stat.label}

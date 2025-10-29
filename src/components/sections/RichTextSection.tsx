@@ -19,7 +19,8 @@ export function RichTextSection(section: RichTextSectionType) {
   }
 
   const palette = resolveSectionBackground(backgroundColor);
-  const widthClass = WIDTH_CLASS_MAP[width ?? "medium"] ?? WIDTH_CLASS_MAP.medium;
+  const widthClass =
+    WIDTH_CLASS_MAP[width ?? "medium"] ?? WIDTH_CLASS_MAP.medium;
 
   return (
     <section
@@ -29,7 +30,12 @@ export function RichTextSection(section: RichTextSectionType) {
       <div className="container-custom">
         <div className={cn("mx-auto flex flex-col gap-6", widthClass)}>
           {headline ? (
-            <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+            <h2
+              className={cn(
+                "text-3xl font-semibold sm:text-4xl",
+                palette.heading
+              )}
+            >
               {headline}
             </h2>
           ) : null}

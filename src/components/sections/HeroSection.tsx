@@ -3,11 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { HeroSection as HeroSectionType } from "@/types";
 
-import {
-  CtaLink,
-  resolveAlignment,
-  resolveSectionBackground,
-} from "./utils";
+import { CtaLink, resolveAlignment, resolveSectionBackground } from "./utils";
 
 export function HeroSection(section: HeroSectionType) {
   const {
@@ -70,8 +66,8 @@ export function HeroSection(section: HeroSectionType) {
               !hasMedia && resolvedAlignment === "center"
                 ? "mx-auto"
                 : !hasMedia && resolvedAlignment === "right"
-                ? "ml-auto"
-                : ""
+                  ? "ml-auto"
+                  : ""
             )}
           >
             {eyebrow ? (
@@ -136,12 +132,7 @@ export function HeroSection(section: HeroSectionType) {
             ) : null}
 
             {primaryCta || secondaryCta ? (
-              <div
-                className={cn(
-                  "mt-4 flex flex-wrap gap-4",
-                  align.actions
-                )}
-              >
+              <div className={cn("mt-4 flex flex-wrap gap-4", align.actions)}>
                 <CtaLink
                   cta={primaryCta ?? undefined}
                   tone={palette.isDark ? "dark" : "light"}

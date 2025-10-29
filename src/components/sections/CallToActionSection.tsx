@@ -1,11 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { CallToActionSection as CallToActionSectionType } from "@/types";
 
-import {
-  CtaLink,
-  resolveAlignment,
-  resolveSectionBackground,
-} from "./utils";
+import { CtaLink, resolveAlignment, resolveSectionBackground } from "./utils";
 
 export function CallToActionSection(section: CallToActionSectionType) {
   const {
@@ -34,7 +30,12 @@ export function CallToActionSection(section: CallToActionSectionType) {
           )}
         >
           {headline ? (
-            <h2 className={cn("text-3xl font-semibold sm:text-4xl", palette.heading)}>
+            <h2
+              className={cn(
+                "text-3xl font-semibold sm:text-4xl",
+                palette.heading
+              )}
+            >
               {headline}
             </h2>
           ) : null}
