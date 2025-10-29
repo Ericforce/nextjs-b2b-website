@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import { getMetadataDefaults } from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -10,10 +11,10 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Next.js B2B Application",
-  description: "A modern B2B application built with Next.js 14",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { metadata } = await getMetadataDefaults();
+  return metadata;
+}
 
 export default function RootLayout({
   children,
