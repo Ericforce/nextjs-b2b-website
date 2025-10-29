@@ -4,7 +4,7 @@ import { cache } from "react";
 import { env } from "@/lib/env";
 import { getSiteSettings } from "@/lib/sanity";
 import type {
-  BlogPostDocument,
+  BlogPost,
   PageDocument,
   SeoFields,
   SeoImage,
@@ -204,15 +204,38 @@ export function buildWebPageJsonLd(
 }
 
 export function buildArticleJsonLd(
-  post: BlogPostDocument,
+  post: BlogPost,
   canonicalUrl: string,
   site: SiteSettings
 ) {
   const baseUrl = getSiteBaseUrl(site);
-  const imageUrl = absoluteUrl(
-    post.featuredImage?.url ?? site.defaultSeo.ogImage?.url,
-    baseUrl
-  );
+  const primaryImageUrl =
+    post.seo?.ogImage?.url ?? post.mainImageUrl ?? site.defaultSeo.ogImage?.url;
+  const imageUrl = primaryImageUrl
+    ? absoluteUrl(primaryImageUrl, baseUrl)
+    : undefined;
+
+  const authorUrl =
+    post.author?.social?.website ??
+    post.author?.social?.linkedin ??
+    post.author?.social?.twitter ??
+    post.author?.social?.github;
+
+  const tagKeywords =
+    post.tags
+      ?.map((tag) => tag?.title)
+      .filter((value): value is string => Boolean(value)) ?? [];
+
+  const seoKeywords =
+    post.seo?.keywords?.filter((keyword): keyword is string => Boolean(keyword)) ??
+    [];
+
+  const keywords =
+    seoKeywords.length > 0
+      ? seoKeywords
+      : tagKeywords.length > 0
+        ? tagKeywords
+        : undefined;
 
   return {
     "@context": "https://schema.org",
@@ -222,11 +245,14 @@ export function buildArticleJsonLd(
     url: canonicalUrl,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
-    author: {
-      "@type": "Person",
-      name: post.author.name,
-      url: post.author.url,
-    },
+    author: post.author
+      ? {
+          "@type": "Person",
+          name: post.author.name,
+          ...(post.author.title ? { jobTitle: post.author.title } : {}),
+          ...(authorUrl ? { url: authorUrl } : {}),
+        }
+      : undefined,
     publisher: {
       "@type": "Organization",
       name: site.siteName,
@@ -238,7 +264,7 @@ export function buildArticleJsonLd(
         : undefined,
     },
     image: imageUrl ? [imageUrl] : undefined,
-    keywords: post.seo?.keywords ?? post.tags,
+    keywords,
     inLanguage: site.locale,
   };
 }

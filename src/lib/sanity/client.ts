@@ -1,4 +1,6 @@
 import { createClient } from "@sanity/client";
+import { setServerClient } from "@sanity/react-loader";
+
 import { apiVersion, dataset, projectId, apiToken, useCdn } from "./config";
 
 export const client = createClient({
@@ -9,3 +11,5 @@ export const client = createClient({
   token: apiToken,
   perspective: "published",
 });
+
+setServerClient(client);
