@@ -385,3 +385,237 @@ export const reusableSectionsQuery = groq`
   }
 }
 `;
+
+const portableTextFields = groq`
+  ...,
+  markDefs[]{
+    ...,
+    _type == "internalLink" => {
+      ...,
+      "slug": select(
+        defined(reference->slug.current) => reference->slug.current,
+        defined(slug.current) => slug.current
+      )
+    }
+  }
+`;
+
+const imageWithMetadataFields = groq`
+  "url": asset->url,
+  "alt": coalesce(alt, asset->altText),
+  "width": asset->metadata.dimensions.width,
+  "height": asset->metadata.dimensions.height,
+  "aspectRatio": asset->metadata.dimensions.aspectRatio,
+  "lqip": asset->metadata.lqip,
+  "palette": asset->metadata.palette
+`;
+
+const blogCategoryBaseFields = groq`
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  seo ${seoFields}
+`;
+
+const blogCategoryWithCountsFields = groq`
+  ${blogCategoryBaseFields},
+  "postCount": count(*[_type in ["blog.post", "blogPost", "post"] && references(^._id)])
+`;
+
+const blogTagBaseFields = groq`
+  _id,
+  title,
+  "slug": slug.current,
+  description,
+  seo ${seoFields}
+`;
+
+const blogTagWithCountsFields = groq`
+  ${blogTagBaseFields},
+  "postCount": count(*[_type in ["blog.post", "blogPost", "post"] && references(^._id)])
+`;
+
+const blogAuthorBaseFields = groq`
+  _id,
+  name,
+  "slug": slug.current,
+  title,
+  role,
+  company,
+  shortBio,
+  bio[]{
+    ${portableTextFields}
+  },
+  "image": select(
+    defined(image.asset) => image{
+      ${imageWithMetadataFields}
+    }
+  ),
+  "social": {
+    twitter,
+    linkedin,
+    github,
+    website
+  },
+  seo ${seoFields}
+`;
+
+const blogAuthorWithCountsFields = groq`
+  ${blogAuthorBaseFields},
+  "postCount": count(*[_type in ["blog.post", "blogPost", "post"] && references(^._id)])
+`;
+
+const blogPostBaseFields = groq`
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  excerpt,
+  "createdAt": coalesce(_createdAt, publishedAt),
+  "publishedAt": coalesce(publishedAt, _createdAt),
+  "updatedAt": coalesce(_updatedAt, publishedAt, _createdAt),
+  seo ${seoFields},
+  "featuredImage": select(
+    defined(mainImage.asset) => mainImage{
+      ${imageWithMetadataFields}
+    },
+    defined(featuredImage.asset) => featuredImage{
+      ${imageWithMetadataFields}
+    }
+  ),
+  "readingTimeMinutes": select(
+    defined(readingTime.minutes) => readingTime.minutes,
+    defined(readingTime) && readingTime match "^[0-9]+(\\.[0-9]+)?$" => readingTime,
+    defined(estimatedReadingTime) => estimatedReadingTime
+  ),
+  "readingTime": coalesce(
+    readingTime.text,
+    readingTimeDescription,
+    readingTimeLabel,
+    readingTime
+  ),
+  "categories": coalesce(categories[]->{
+    ${blogCategoryBaseFields}
+  }, []),
+  "tags": coalesce(tags[]->{
+    ${blogTagBaseFields}
+  }, []),
+  "author": select(
+    defined(author->) => author->{
+      ${blogAuthorBaseFields}
+    }
+  )
+`;
+
+const blogPostListingFields = groq`
+{
+  ${blogPostBaseFields}
+}
+`;
+
+const blogPostDetailFields = groq`
+{
+  ${blogPostBaseFields},
+  body[]{
+    ${portableTextFields},
+    _type == "image" => {
+      ...,
+      "asset": asset->{
+        ${imageWithMetadataFields}
+      }
+    }
+  }
+}
+`;
+
+export const blogPostSlugsQuery = groq`
+  *[_type in ["blog.post", "blogPost", "post"] && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;
+
+export const blogPostsQuery = groq`
+  *[_type in ["blog.post", "blogPost", "post"] && defined(slug.current)] | order(publishedAt desc, _updatedAt desc){
+    ${blogPostListingFields}
+  }
+`;
+
+export const paginatedBlogPostsQuery = groq`
+{
+  "posts": *[_type in ["blog.post", "blogPost", "post"] && defined(slug.current)
+    && (!defined($categorySlug) || $categorySlug in categories[]->slug.current)
+    && (!defined($tagSlug) || $tagSlug in tags[]->slug.current)
+    && (!defined($authorSlug) || author->slug.current == $authorSlug)
+    && (!defined($excludeSlug) || slug.current != $excludeSlug)
+  ] | order(publishedAt desc, _updatedAt desc)[$start...$end]{
+    ${blogPostListingFields}
+  },
+  "total": count(*[_type in ["blog.post", "blogPost", "post"] && defined(slug.current)
+    && (!defined($categorySlug) || $categorySlug in categories[]->slug.current)
+    && (!defined($tagSlug) || $tagSlug in tags[]->slug.current)
+    && (!defined($authorSlug) || author->slug.current == $authorSlug)
+    && (!defined($excludeSlug) || slug.current != $excludeSlug)
+  ])
+}
+`;
+
+export const blogPostBySlugQuery = groq`
+  *[_type in ["blog.post", "blogPost", "post"] && slug.current == $slug][0]{
+    ${blogPostDetailFields}
+  }
+`;
+
+export const blogCategoriesQuery = groq`
+  *[_type in ["blog.category", "blogCategory", "category"] && defined(slug.current)] | order(title asc){
+    ${blogCategoryWithCountsFields}
+  }
+`;
+
+export const blogCategoryBySlugQuery = groq`
+  *[_type in ["blog.category", "blogCategory", "category"] && slug.current == $slug][0]{
+    ${blogCategoryWithCountsFields}
+  }
+`;
+
+export const blogCategorySlugsQuery = groq`
+  *[_type in ["blog.category", "blogCategory", "category"] && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;
+
+export const blogTagsQuery = groq`
+  *[_type in ["blog.tag", "blogTag", "tag"] && defined(slug.current)] | order(title asc){
+    ${blogTagWithCountsFields}
+  }
+`;
+
+export const blogTagBySlugQuery = groq`
+  *[_type in ["blog.tag", "blogTag", "tag"] && slug.current == $slug][0]{
+    ${blogTagWithCountsFields}
+  }
+`;
+
+export const blogTagSlugsQuery = groq`
+  *[_type in ["blog.tag", "blogTag", "tag"] && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;
+
+export const blogAuthorsQuery = groq`
+  *[_type in ["author", "blog.author", "blogAuthor"] && defined(slug.current)] | order(name asc){
+    ${blogAuthorWithCountsFields}
+  }
+`;
+
+export const blogAuthorBySlugQuery = groq`
+  *[_type in ["author", "blog.author", "blogAuthor"] && slug.current == $slug][0]{
+    ${blogAuthorWithCountsFields}
+  }
+`;
+
+export const blogAuthorSlugsQuery = groq`
+  *[_type in ["author", "blog.author", "blogAuthor"] && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;

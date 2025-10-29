@@ -1,10 +1,30 @@
 import type { PortableTextBlock } from "@portabletext/types";
 
+export interface SanityImagePaletteSwatch {
+  background?: string;
+  foreground?: string;
+  population?: number;
+  title?: string;
+}
+
+export interface SanityImagePalette {
+  dominant?: SanityImagePaletteSwatch;
+  vibrant?: SanityImagePaletteSwatch;
+  muted?: SanityImagePaletteSwatch;
+  darkVibrant?: SanityImagePaletteSwatch;
+  lightVibrant?: SanityImagePaletteSwatch;
+  darkMuted?: SanityImagePaletteSwatch;
+  lightMuted?: SanityImagePaletteSwatch;
+}
+
 export interface SanityImageAsset {
   url: string;
   alt?: string;
   width?: number;
   height?: number;
+  aspectRatio?: number;
+  lqip?: string;
+  palette?: SanityImagePalette;
 }
 
 export type SeoImage = SanityImageAsset;
@@ -245,23 +265,68 @@ export interface PageDocument {
   sections?: PageSection[];
 }
 
+export interface BlogAuthorSocialLinks {
+  twitter?: string;
+  linkedin?: string;
+  github?: string;
+  website?: string;
+}
+
 export interface BlogAuthor {
+  _id?: string;
   name: string;
-  url?: string;
+  slug: string;
+  title?: string;
+  role?: string;
+  company?: string;
+  shortBio?: string;
+  bio?: PortableTextBlock[];
+  image?: SanityImageAsset | null;
+  social?: BlogAuthorSocialLinks;
+  seo?: SeoFields;
+}
+
+export interface BlogCategory {
+  _id?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  seo?: SeoFields;
+  postCount?: number;
+}
+
+export interface BlogTag {
+  _id?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  seo?: SeoFields;
+  postCount?: number;
 }
 
 export interface BlogPostDocument {
-  _type: "post";
+  _id?: string;
+  _type: "blog.post" | "blogPost" | "post";
   slug: string;
   title: string;
-  excerpt: string;
-  body: string;
-  tags?: string[];
+  excerpt?: string;
+  body?: PortableTextBlock[];
+  categories: BlogCategory[];
+  tags: BlogTag[];
+  author?: BlogAuthor | null;
+  featuredImage?: SanityImageAsset | null;
+  readingTimeMinutes?: number;
   readingTime?: string;
-  featuredImage?: SanityImageAsset;
-  createdAt: string;
+  createdAt?: string;
   publishedAt: string;
   updatedAt?: string;
-  author: BlogAuthor;
   seo?: SeoFields;
+}
+
+export interface PaginatedBlogPosts {
+  posts: BlogPostDocument[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
 }

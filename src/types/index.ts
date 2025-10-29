@@ -24,4 +24,8 @@ export type {
   ReusableSectionReference,
   BlogPostDocument,
   BlogAuthor,
+  BlogAuthorSocialLinks,
+  BlogCategory,
+  BlogTag,
+  PaginatedBlogPosts,
 } from "./sanity";

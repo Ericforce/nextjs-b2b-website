@@ -13,3 +13,5 @@ export const ROUTES = {
   SIGNUP: "/signup",
   DEMO: "/demo",
 } as const;
+
+export const BLOG_PAGE_SIZE = 9;
