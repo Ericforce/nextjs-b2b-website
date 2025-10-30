@@ -6,10 +6,17 @@ This directory contains comprehensive guides for developers and content editors 
 
 ### Getting Started
 1. Read the main [README.md](../README.md) for quick start instructions
-2. Review [architecture.md](./architecture.md) to understand the system design
-3. Consult [operations.md](./operations.md) for deployment and maintenance
+2. Follow [setup-and-testing.md](./setup-and-testing.md) to configure your environment and run smoke tests
+3. Review [architecture.md](./architecture.md) to understand the system design
+4. Consult [operations.md](./operations.md) for deployment and maintenance
 
 ### Technical Documentation
+
+**[setup-and-testing.md](./setup-and-testing.md)**
+- Local environment prerequisites
+- `.env.local` template and variable reference
+- Running Next.js and Sanity Studio in development
+- Frontend/backend smoke tests and troubleshooting tips
 
 **[architecture.md](./architecture.md)**
 - Complete technical overview
@@ -77,10 +84,11 @@ This directory contains comprehensive guides for developers and content editors 
 docs/
 ├── README.md              # This file - documentation index
 ├── architecture.md        # Technical architecture and implementation
+├── contact-workflow.md    # Contact form and email workflow
 ├── content-model.md       # Sanity schemas and content types
 ├── editing-guide.md       # Guide for content editors
 ├── operations.md          # Deployment and operations guide
-└── contact-workflow.md    # Contact form and email workflow
+└── setup-and-testing.md   # Local environment setup and smoke testing
 ```
 
 ## Contributing to Documentation
