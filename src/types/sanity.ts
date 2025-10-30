@@ -272,59 +272,55 @@ export interface PageDocument {
 export interface AuthorDocument {
   _id: string;
   _type: "author";
+  slug: string;
   name: string;
-  slug: {
-    current: string;
-  };
   bio?: string;
+  role?: string;
   image?: SanityImageAsset;
   website?: string;
   email?: string;
-  socialLinks?: SiteSocialLinks;
+  social?: SiteSocialLinks;
   _updatedAt?: string;
 }
 
 export interface CategoryDocument {
   _id: string;
   _type: "category";
+  slug: string;
   title: string;
-  slug: {
-    current: string;
-  };
   description?: string;
   color?: string;
   icon?: string;
+  postCount?: number;
   _updatedAt?: string;
 }
 
 export interface TagDocument {
   _id: string;
   _type: "tag";
+  slug: string;
   title: string;
-  slug: {
-    current: string;
-  };
   description?: string;
   color?: string;
+  postCount?: number;
   _updatedAt?: string;
 }
 
 export interface BlogPostDocument {
-  _id?: string;
+  _id: string;
   _type: "blogPost";
-  slug: {
-    current: string;
-  };
+  slug: string;
   title: string;
-  excerpt: string;
+  excerpt?: string;
   featuredImage?: SanityImageAsset;
   body?: PortableTextBlock[];
-  author?: AuthorDocument;
-  categories?: CategoryDocument[];
-  tags?: TagDocument[];
+  author?: AuthorDocument | null;
+  categories: CategoryDocument[];
+  tags: TagDocument[];
+  readingTime?: string;
   publishedAt?: string;
   createdAt?: string;
-  _updatedAt?: string;
+  updatedAt?: string;
   seo?: SeoFields;
 }
 

@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import Link from "next/link";
 
-import { getAllBlogPosts, getBlogPostBySlug } from "@/lib/sanity";
+import { AuthorBadge } from "@/components/blog";
+import { PortableText } from "@/components/portable-text";
+import {
+  DEFAULT_SANITY_REVALIDATE,
+  getAllBlogPostSlugs,
+  getBlogPostBySlug,
+} from "@/lib/sanity";
 import {
   absoluteUrl,
   buildArticleJsonLd,
@@ -10,6 +18,9 @@ import {
   getMetadataDefaults,
   jsonLdScriptProps,
 } from "@/lib/seo";
+import { formatDate } from "@/lib/utils/format";
+
+export const revalidate = DEFAULT_SANITY_REVALIDATE;
 
 interface BlogPostPageProps {
   params: {
@@ -18,8 +29,8 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  const documents = await getAllBlogPosts();
-  return documents.map((post) => ({ slug: post.slug }));
+  const slugs = await getAllBlogPostSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -33,13 +44,13 @@ export async function generateMetadata({
 
   return generatePageMetadata({
     title: post.title,
-    description: post.excerpt,
+    description: post.seo?.description ?? post.excerpt,
     seo: post.seo,
     canonicalPath: post.seo?.canonical ?? `/blog/${post.slug}`,
     type: "article",
     publishedTime: post.publishedAt,
     modifiedTime: post.updatedAt ?? post.publishedAt,
-    authors: [post.author.name],
+    authors: post.author ? [post.author.name] : undefined,
   });
 }
 
@@ -57,92 +68,113 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   );
   const jsonLd = buildArticleJsonLd(post, canonicalUrl, siteSettings);
 
+  const publishedDate = post.publishedAt ? formatDate(post.publishedAt) : null;
+  const updatedDate =
+    post.updatedAt && post.updatedAt !== post.publishedAt
+      ? formatDate(post.updatedAt)
+      : null;
+
   return (
     <>
-      <Script {...jsonLdScriptProps(`article-jsonld-${post.slug}`, jsonLd)} />
-      <article className="container-custom mx-auto max-w-3xl py-16 lg:py-24">
-        <header className="space-y-4">
-          <p className="text-sm uppercase tracking-wide text-primary-600">
-            Blog
-          </p>
-          <h1 className="text-4xl font-bold tracking-tight text-secondary-900">
-            {post.title}
-          </h1>
-          <p className="text-lg text-secondary-600">{post.excerpt}</p>
-          <div className="text-sm text-secondary-500">
-            <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
-            {post.readingTime ? (
-              <>
-                <span className="mx-2">•</span>
-                <span>{post.readingTime}</span>
-              </>
+      <Script
+        {...jsonLdScriptProps(`article-jsonld-${post.slug}`, jsonLd)}
+      />
+
+      <article className="container-custom mx-auto max-w-3xl space-y-12 py-16 lg:py-24">
+        <header className="space-y-6 text-center">
+          {post.categories.length > 0 ? (
+            <div className="flex flex-wrap justify-center gap-2">
+              {post.categories.map((category) => (
+                <Link
+                  key={category._id}
+                  href={`/blog/category/${category.slug}`}
+                  className="inline-flex items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 transition-colors hover:border-primary-400 hover:text-primary-800"
+                >
+                  {category.title}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold tracking-tight text-secondary-900 sm:text-5xl">
+              {post.title}
+            </h1>
+            {post.excerpt ? (
+              <p className="text-lg text-secondary-600">{post.excerpt}</p>
             ) : null}
           </div>
-          <div className="text-sm text-secondary-500">
-            By {post.author.name}
+
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+            <AuthorBadge author={post.author} showLinks />
+            <div className="flex flex-col items-center gap-2 text-sm text-secondary-500 sm:items-start">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                {publishedDate ? <span>Published {publishedDate}</span> : null}
+                {publishedDate && post.readingTime ? (
+                  <span aria-hidden="true">•</span>
+                ) : null}
+                {post.readingTime ? <span>{post.readingTime}</span> : null}
+              </div>
+              {updatedDate ? <span>Updated {updatedDate}</span> : null}
+            </div>
           </div>
         </header>
 
-        <div className="mt-12 space-y-8">{renderPortableText(post.body)}</div>
+        {post.featuredImage?.url ? (
+          <figure className="overflow-hidden rounded-3xl border border-secondary-200">
+            <Image
+              src={post.featuredImage.url}
+              alt={post.featuredImage.alt ?? post.title}
+              width={post.featuredImage.width ?? 1200}
+              height={post.featuredImage.height ?? 630}
+              className="h-auto w-full object-cover"
+              priority={false}
+            />
+            {post.featuredImage.alt ? (
+              <figcaption className="px-4 py-3 text-sm text-secondary-500">
+                {post.featuredImage.alt}
+              </figcaption>
+            ) : null}
+          </figure>
+        ) : null}
+
+        <div className="prose prose-lg mx-auto max-w-none text-secondary-700">
+          <PortableText value={post.body} />
+        </div>
+
+        <footer className="space-y-6 border-t border-secondary-200 pt-8">
+          {post.tags.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag._id}
+                  href={`/blog/tag/${tag.slug}`}
+                  className="inline-flex items-center rounded-full border border-secondary-200 bg-secondary-50 px-3 py-1 text-xs font-medium text-secondary-600 transition-colors hover:border-primary-200 hover:text-primary-700"
+                >
+                  #{tag.title}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+
+          {post.categories.length > 0 ? (
+            <div className="text-sm text-secondary-500">
+              Posted in {" "}
+              {post.categories.map((category, index) => (
+                <span key={category._id}>
+                  <Link
+                    href={`/blog/category/${category.slug}`}
+                    className="font-medium text-primary-600 hover:text-primary-700"
+                  >
+                    {category.title}
+                  </Link>
+                  {index < post.categories.length - 1 ? ", " : ""}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </footer>
       </article>
     </>
   );
-}
-
-function renderPortableText(body: string) {
-  const sections = body.split(/\n\n+/);
-
-  return sections.map((section, index) => {
-    const lines = section.split("\n").filter(Boolean);
-    if (lines.length === 0) {
-      return null;
-    }
-
-    const headingLine = lines[0];
-    if (headingLine.startsWith("## ")) {
-      const heading = headingLine.replace(/^##\s*/, "");
-      const contentLines = lines.slice(1);
-      const allListItems =
-        contentLines.length > 0 &&
-        contentLines.every((line) => line.trim().startsWith("- "));
-
-      return (
-        <section key={`${heading}-${index}`} className="space-y-4">
-          <h2 className="text-2xl font-semibold text-secondary-900">
-            {heading}
-          </h2>
-          {allListItems ? (
-            <ul className="ml-6 list-disc space-y-2 text-secondary-600">
-              {contentLines.map((line, lineIndex) => (
-                <li key={lineIndex}>{line.replace(/^[-*]\s*/, "")}</li>
-              ))}
-            </ul>
-          ) : contentLines.length > 0 ? (
-            <p className="text-secondary-600">
-              {contentLines.join(" ").trim()}
-            </p>
-          ) : null}
-        </section>
-      );
-    }
-
-    if (lines.every((line) => line.trim().startsWith("- "))) {
-      return (
-        <ul
-          key={`list-${index}`}
-          className="ml-6 list-disc space-y-2 text-secondary-600"
-        >
-          {lines.map((line, lineIndex) => (
-            <li key={lineIndex}>{line.replace(/^[-*]\s*/, "")}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <p key={`paragraph-${index}`} className="text-secondary-600">
-        {section.replace(/^##\s*/, "").trim()}
-      </p>
-    );
-  });
 }
