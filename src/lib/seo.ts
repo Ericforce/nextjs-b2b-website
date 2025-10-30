@@ -209,10 +209,31 @@ export function buildArticleJsonLd(
   site: SiteSettings
 ) {
   const baseUrl = getSiteBaseUrl(site);
-  const imageUrl = absoluteUrl(
-    post.featuredImage?.url ?? site.defaultSeo.ogImage?.url,
-    baseUrl
-  );
+  const featuredImageUrl = post.featuredImage?.url ?? site.defaultSeo.ogImage?.url;
+  const imageUrl = featuredImageUrl
+    ? absoluteUrl(featuredImageUrl, baseUrl)
+    : undefined;
+
+  const author = post.author ?? null;
+  const authorWebsite = author?.website
+    ? absoluteUrl(author.website, baseUrl)
+    : undefined;
+
+  const authorSameAs = author?.social
+    ? Object.values(author.social)
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && value.trim().length > 0 && /^https?:\/\//.test(value)
+        )
+        .map((value) => absoluteUrl(value, baseUrl))
+    : undefined;
+
+  const keywordCandidates = post.seo?.keywords?.length
+    ? post.seo.keywords
+    : [
+        ...post.categories.map((category) => category.title).filter(Boolean),
+        ...post.tags.map((tag) => tag.title).filter(Boolean),
+      ];
 
   return {
     "@context": "https://schema.org",
@@ -222,24 +243,30 @@ export function buildArticleJsonLd(
     url: canonicalUrl,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt ?? post.publishedAt,
-    author: {
-      "@type": "Person",
-      name: post.author.name,
-      url: post.author.url,
-    },
+    author: author
+      ? {
+          "@type": "Person",
+          name: author.name,
+          url: authorWebsite,
+          sameAs:
+            authorSameAs && authorSameAs.length > 0 ? authorSameAs : undefined,
+        }
+      : undefined,
     publisher: {
       "@type": "Organization",
       name: site.siteName,
-      logo: site.logo
-        ? {
-            "@type": "ImageObject",
-            url: absoluteUrl(site.logo, baseUrl),
-          }
-        : undefined,
+      logo:
+        site.logo?.url
+          ? {
+              "@type": "ImageObject",
+              url: absoluteUrl(site.logo.url, baseUrl),
+            }
+          : undefined,
     },
     image: imageUrl ? [imageUrl] : undefined,
-    keywords: post.seo?.keywords ?? post.tags,
+    keywords: keywordCandidates.length > 0 ? keywordCandidates : undefined,
     inLanguage: site.locale,
+    articleSection: post.categories[0]?.title ?? undefined,
   };
 }
 

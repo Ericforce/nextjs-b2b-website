@@ -372,13 +372,64 @@ export const reusableSectionsQuery = groq`
 }
 `;
 
-export const allBlogPostsQuery = groq`
-*[_type == "blogPost" && defined(slug.current)] | order(publishedAt desc){
+const blogAuthorFields = groq`
+  _id,
+  _type,
+  name,
+  "slug": slug.current,
+  bio,
+  role,
+  website,
+  email,
+  "social": socialLinks{
+    twitter,
+    linkedin,
+    github,
+    youtube,
+    facebook,
+    instagram
+  },
+  "image": select(
+    defined(image.asset) => {
+      "url": image.asset->url,
+      "width": image.asset->metadata.dimensions.width,
+      "height": image.asset->metadata.dimensions.height,
+      "alt": coalesce(image.alt, image.asset->altText)
+    }
+  ),
+  "_updatedAt": coalesce(_updatedAt, _createdAt)
+`;
+
+const blogCategoryFields = groq`
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  description,
+  color,
+  icon,
+  "postCount": count(*[_type == "blogPost" && references(^._id)]),
+  "_updatedAt": coalesce(_updatedAt, _createdAt)
+`;
+
+const blogTagFields = groq`
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  description,
+  color,
+  "postCount": count(*[_type == "blogPost" && references(^._id)]),
+  "_updatedAt": coalesce(_updatedAt, _createdAt)
+`;
+
+const blogPostListingFields = groq`
   _id,
   _type,
   title,
   "slug": slug.current,
   excerpt,
+  readingTime,
   "featuredImage": select(
     defined(featuredImage.asset) => {
       "url": featuredImage.asset->url,
@@ -388,11 +439,47 @@ export const allBlogPostsQuery = groq`
     }
   ),
   "publishedAt": coalesce(publishedAt, _createdAt),
-  "updatedAt": _updatedAt,
-  "author": author->{_id, name, "slug": slug.current, image},
-  "categories": categories[]->{_id, title, "slug": slug.current, color},
-  "tags": tags[]->{_id, title, "slug": slug.current, color},
+  "createdAt": _createdAt,
+  "updatedAt": coalesce(_updatedAt, publishedAt, _createdAt),
+  "author": author->{${blogAuthorFields}},
+  "categories": coalesce(categories[]->{${blogCategoryFields}}, []),
+  "tags": coalesce(tags[]->{${blogTagFields}}, []),
   seo ${seoFields}
+`;
+
+const blogPostDetailFields = groq`
+  ${blogPostListingFields},
+  "body": body[]{
+    ...,
+    markDefs[]{
+      ...,
+      _type == "linkInternal" => {
+        ...,
+        "reference": reference->{_id, _type, title, "slug": slug.current}
+      }
+    }
+  }
+`;
+
+const blogPostFilterCondition = groq`
+  _type == "blogPost" && defined(slug.current)
+  && (!defined($category) || $category == "" || $category in categories[]->slug.current)
+  && (!defined($tag) || $tag == "" || $tag in tags[]->slug.current)
+  && (!defined($author) || $author == "" || author->slug.current == $author)
+`;
+
+export const allBlogPostsQuery = groq`
+*[_type == "blogPost" && defined(slug.current)] | order(coalesce(publishedAt, _createdAt) desc, coalesce(_updatedAt, _createdAt) desc){
+  ${blogPostListingFields}
+}
+`;
+
+export const blogPostsPaginatedQuery = groq`
+{
+  "items": *[${blogPostFilterCondition}] | order(coalesce(publishedAt, _createdAt) desc, coalesce(_updatedAt, _createdAt) desc)[$start...$end]{
+    ${blogPostListingFields}
+  },
+  "total": count(*[${blogPostFilterCondition}])
 }
 `;
 
@@ -404,117 +491,56 @@ export const blogPostSlugsQuery = groq`
 
 export const blogPostBySlugQuery = groq`
 *[_type == "blogPost" && slug.current == $slug][0]{
-  _id,
-  _type,
-  title,
-  "slug": slug.current,
-  excerpt,
-  "featuredImage": select(
-    defined(featuredImage.asset) => {
-      "url": featuredImage.asset->url,
-      "width": featuredImage.asset->metadata.dimensions.width,
-      "height": featuredImage.asset->metadata.dimensions.height,
-      "alt": coalesce(featuredImage.alt, featuredImage.asset->altText)
-    }
-  ),
-  body[]{
-    ...,
-    markDefs[]{
-      ...,
-      _type == "linkInternal" => {
-        ...,
-        "reference": reference->{_id, _type, title, "slug": slug.current}
-      }
-    }
+  ${blogPostDetailFields}
+}
+`;
+
+export const blogFiltersQuery = groq`
+{
+  "categories": *[_type == "category" && defined(slug.current)] | order(title asc){
+    ${blogCategoryFields}
   },
-  "publishedAt": coalesce(publishedAt, _createdAt),
-  "createdAt": _createdAt,
-  "updatedAt": _updatedAt,
-  "author": author->{_id, name, "slug": slug.current, bio, image, website, email, socialLinks},
-  "categories": categories[]->{_id, title, "slug": slug.current, description, color, icon},
-  "tags": tags[]->{_id, title, "slug": slug.current, description, color},
-  seo ${seoFields}
+  "tags": *[_type == "tag" && defined(slug.current)] | order(title asc){
+    ${blogTagFields}
+  },
+  "authors": *[_type == "author" && defined(slug.current)] | order(name asc){
+    ${blogAuthorFields}
+  }
 }
 `;
 
 export const allAuthorsQuery = groq`
 *[_type == "author" && defined(slug.current)] | order(name asc){
-  _id,
-  name,
-  "slug": slug.current,
-  bio,
-  "image": select(
-    defined(image.asset) => {
-      "url": image.asset->url,
-      "width": image.asset->metadata.dimensions.width,
-      "height": image.asset->metadata.dimensions.height,
-      "alt": coalesce(image.alt, image.asset->altText)
-    }
-  ),
-  website,
-  email,
-  socialLinks
+  ${blogAuthorFields}
 }
 `;
 
 export const authorBySlugQuery = groq`
 *[_type == "author" && slug.current == $slug][0]{
-  _id,
-  name,
-  "slug": slug.current,
-  bio,
-  "image": select(
-    defined(image.asset) => {
-      "url": image.asset->url,
-      "width": image.asset->metadata.dimensions.width,
-      "height": image.asset->metadata.dimensions.height,
-      "alt": coalesce(image.alt, image.asset->altText)
-    }
-  ),
-  website,
-  email,
-  socialLinks
+  ${blogAuthorFields}
 }
 `;
 
 export const allCategoriesQuery = groq`
 *[_type == "category" && defined(slug.current)] | order(title asc){
-  _id,
-  title,
-  "slug": slug.current,
-  description,
-  color,
-  icon
+  ${blogCategoryFields}
 }
 `;
 
 export const categoryBySlugQuery = groq`
 *[_type == "category" && slug.current == $slug][0]{
-  _id,
-  title,
-  "slug": slug.current,
-  description,
-  color,
-  icon
+  ${blogCategoryFields}
 }
 `;
 
 export const allTagsQuery = groq`
 *[_type == "tag" && defined(slug.current)] | order(title asc){
-  _id,
-  title,
-  "slug": slug.current,
-  description,
-  color
+  ${blogTagFields}
 }
 `;
 
 export const tagBySlugQuery = groq`
 *[_type == "tag" && slug.current == $slug][0]{
-  _id,
-  title,
-  "slug": slug.current,
-  description,
-  color
+  ${blogTagFields}
 }
 `;
